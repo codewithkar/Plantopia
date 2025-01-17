@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onyx - My Addresses</title>
+    <link rel="stylesheet" href="tailwindcss/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body class="bg-[##FFF6F4]">
+    <!-- nav -->
+    <%- include("../partials/nav") %>
+    <div class="h-10"></div>
+    <!-- Main Content -->
+    <main class="container mx-auto flex flex-col md:flex-row py-10 px-6 gap-6">
+      <!-- Sidebar -->
+      <%- include("../partials/profileSidebar") %>
+      <!-- Address Information -->
+      <section class="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-6 text-gray-800">My Addresses</h2>
+        <div class="flex justify-end mb-4">
+          <button 
+            onclick="openAddAddressModal()"
+            class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors flex items-center space-x-2"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add New Address</span>
+          </button>
+        </div>
+       
+      </section>
+    </main>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold" id="modalTitle">Add New Address</h3>
+            <button onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <form id="addressForm" class="space-y-4">
+            <input type="hidden" id="addressId" name="addressId">
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Full Name</label>
+              <input type="text" id="fullName" name="fullName"
+                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-black focus:ring-black">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
+              <input type="tel" id="mobile" name="mobileNumber"
+                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-black focus:ring-black">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Address Line 1</label>
+              <input type="text" id="addressLine1" name="addressLine1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Address Line 2</label>
+              <input type="text" id="addressLine2" name="addressLine2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">City</label>
+                <input type="text" id="city" name="city" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">State</label>
+                <select id="state" name="state" 
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                    <option value="">Select State</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                    <option value="Daman and Diu">Daman and Diu</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Lakshadweep">Lakshadweep</option>
+                    <option value="Puducherry">Puducherry</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">PIN Code</label>
+              <input type="text" id="pincode" name="pincode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6">
+              <button type="button" onclick="closeAddressModal()" class="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50">
+                Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800">
+                Save Address
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <%- include("../partials/footer") %>
+
+    <script>
+      // Modal functions
+      function openAddAddressModal() {
+        document.getElementById('modalTitle').textContent = 'Add New Address';
+        document.getElementById('addressForm').reset();
+        document.getElementById('addressId').value = '';
+        document.getElementById('addressModal').classList.remove('hidden');
+      }
+
+      function closeAddressModal() {
+        document.getElementById('addressModal').classList.add('hidden');
+      }
+
+      // Form submission
+      document.getElementById('addressForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        const addressId = data.addressId;
+        
+        // Trim all input values
+        Object.keys(data).forEach(key => {
+            data[key] = data[key].trim();
+        });
+
+        if (!data.fullName || !data.mobileNumber || !data.addressLine1 || 
+        !data.city || !data.state || !data.pincode) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'All fields are required'
+        });
+        return;
+    }
+
+        // Check for empty spaces
+        if (!data.fullName.replace(/\s/g, '').length) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Full name cannot be just spaces'
+            });
+            return;
+        }
+
+        // Capitalize first letter of each word function
+        const capitalizeWords = (str) => {
+            return str.toLowerCase().split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        };
+
+        // Validation for full name (letters only and max 15 characters)
+        if (!data.fullName) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter your full name'
+            });
+            return;
+        }
+
+        if (!/^[A-Za-z\s]+$/.test(data.fullName)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Full name should contain only letters'
+            });
+            return;
+        }
+
+        if (data.fullName.length > 15) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Full name should not exceed 15 characters'
+            });
+            return;
+        }
+
+        // Capitalize full name
+        data.fullName = capitalizeWords(data.fullName);
+
+        if (!data.mobileNumber) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter your mobile number'
+            });
+            return;
+        }
+
+        if (!/^[0-9]{10}$/.test(data.mobileNumber)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter a valid 10-digit mobile number'
+            });
+            return;
+        }
+
+        if (!data.addressLine1) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter your address'
+            });
+            return;
+        }
+
+        if (!data.addressLine1.replace(/\s/g, '').length) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Address cannot be just spaces'
+            });
+            return;
+        }
+
+        // Address length validation
+        if (data.addressLine1.length > 30) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Address should not exceed 30 characters'
+            });
+            return;
+        }
+
+        // Capitalize first letter of address
+        data.addressLine1 = data.addressLine1.charAt(0).toUpperCase() + data.addressLine1.slice(1);
+        if (data.addressLine2) {
+            data.addressLine2 = data.addressLine2.trim();
+            if (data.addressLine2.length > 0) {
+                data.addressLine2 = data.addressLine2.charAt(0).toUpperCase() + data.addressLine2.slice(1);
+            }
+        }
+
+        if (!data.city) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter your city'
+            });
+            return;
+        }
+
+        if (!data.city.replace(/\s/g, '').length) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'City cannot be just spaces'
+            });
+            return;
+        }
+
+        // City length validation
+        if (data.city.length > 15) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'City name should not exceed 15 characters'
+            });
+            return;
+        }
+
+        // Capitalize city
+        data.city = capitalizeWords(data.city);
+
+        if (!data.state) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a state'
+            });
+            return;
+        }
+
+        if (!data.pincode) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter your PIN code'
+            });
+            return;
+        }
+
+        if (!/^[0-9]{6}$/.test(data.pincode)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter a valid 6-digit PIN code'
+            });
+            return;
+        }
+        
+        try {
+            const url = addressId ? `/address/${addressId}` : '/address/add';
+            const method = addressId ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to save address');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: result.message,
+                showConfirmButton: true,
+                timer: 3000
+            }).then(() => {
+                window.location.reload();
+            });
+            
+            closeAddressModal();
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message
+            });
+        }
+      });
+
+      // Delete address function
+      async function deleteAddress(addressId) {
+        try {
+          const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          });
+
+          if (result.isConfirmed) {
+            const response = await fetch(`/address/${addressId}`, {
+              method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to delete address');
+            }
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: data.message,
+              showConfirmButton: true,
+              timer: 3000
+            }).then(() => {
+              window.location.reload();
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+          });
+        }
+      }
+
+      function editAddress(addressId, addressData) {
+        // Update modal title
+        document.getElementById('modalTitle').textContent = 'Edit Address';
+        
+        // Fill form with existing data
+        document.getElementById('addressId').value = addressId;
+        document.getElementById('fullName').value = addressData.fullName;
+        document.getElementById('mobile').value = addressData.mobileNumber;
+        document.getElementById('addressLine1').value = addressData.addressLine1;
+        document.getElementById('addressLine2').value = addressData.addressLine2 || '';
+        document.getElementById('city').value = addressData.city;
+        document.getElementById('state').value = addressData.state;
+        document.getElementById('pincode').value = addressData.pincode;
+        
+        // Show modal
+        document.getElementById('addressModal').classList.remove('hidden');
+      }
+    </script>
+  </body>
+</html>

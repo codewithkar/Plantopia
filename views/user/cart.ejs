@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="tailwindcss/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Onyx Cart</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+
+  <body class="bg-[##FFF6F4]">
+    <%- include("../partials/nav") %>
+
+    <!-- Cart Section -->
+    <div class="container mx-auto px-4 py-8 mt-28">
+      <div class="flex flex-row-reverse items-start space-x-reverse space-x-8">
+        <!-- Products Section (Right Side) -->
+        <div class="w-3/4">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8">Shopping Cart</h1>
+            
+
+            <!-- Additional Info -->
+            <div class="mt-4 text-center text-xs text-gray-500">
+              <p class="flex items-center justify-center gap-2">
+                <i class="fas fa-shield-alt"></i>
+                Secure Checkout
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+    
+
+    <style>
+      .quantity-btn {
+        transition: all 0.2s ease;
+      }
+
+      .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .quantity-btn:not(:disabled):hover {
+        transform: scale(1.05);
+      }
+
+      .quantity-btn:not(:disabled):active {
+        transform: scale(0.95);
+      }
+    </style>
+  </body>
+</html>

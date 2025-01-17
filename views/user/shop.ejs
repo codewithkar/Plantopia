@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="tailwindcss/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Shop Page</title>
+  </head>
+
+  <body class="bg-[##FFF6F4]">
+    <%- include("../partials/nav") %>
+    <div class="mt-16"></div>
+
+    <!-- Breadcrumb -->
+    <div class="bg-[##FFF6F4] pt-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="text-sm font-medium text-gray-500" aria-label="Breadcrumb">
+          <ol class="flex items-center space-x-2">
+            <!-- Home Link -->
+            <li>
+              <a
+                href="/home"
+                class="text-gray-800 hover:text-gray-900 transition"
+              >
+                Home
+              </a>
+            </li>
+            <!-- Separator -->
+            <li>
+              <span class="text-gray-400">/</span>
+            </li>
+            <!-- Current Page -->
+            <li class="text-gray-500">Shop</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="bg-[##FFF6F4]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+          Shop All
+        </h2>
+
+        <div class="flex flex-col md:flex-row gap-8 ">
+          <!-- Left Sidebar - Filters -->
+          <div class="md:w-1/4">
+            <div
+              class="sticky top-4 space-y-6 bg-white p-6 rounded-lg shadow-sm"
+            >
+              <!-- Sorting Section -->
+              <div class="mb-6">
+                <label
+                  for="sortFilter"
+                  class="block text-gray-700 font-medium mb-2"
+                  >Sort By</label
+                >
+                <select
+                  id="sortFilter"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                >
+                  <option value="default">Default</option>
+                  <option value="priceLowToHigh">Price: Low to High</option>
+                  <option value="priceHighToLow">Price: High to Low</option>
+                  <option value="ratingHighToLow">Rating: High to Low</option>
+                  <option value="newArrivals">New Arrivals</option>
+                </select>
+              </div>
+
+              <!-- Filter Section -->
+              <div class="space-y-4">
+                <div>
+                  <label
+                    for="catType"
+                    class="block text-gray-700 font-medium mb-2"
+                    >Shop for</label
+                  >
+                  <select
+                    id="catType"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                  >
+                    <option value>All</option>
+                    <option value="male">Seeds</option>
+                    <option value="female">Plants</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="size"
+                    class="block text-gray-700 font-medium mb-2"
+                    >size</label
+                  >
+                  <select
+                    id="size"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                  >
+                    <option value>All</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 font-medium mb-2"
+                    >Price Range</label
+                  >
+                  <div class="flex gap-2">
+                    <input
+                      type="number"
+                      id="minPrice"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                      placeholder="Min"
+                    />
+                    <input
+                      type="number"
+                      id="maxPrice"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    for="stockFilter"
+                    class="block text-gray-700 font-medium mb-2"
+                    >Stock Status</label
+                  >
+                  <select
+                    id="stockFilter"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                  >
+                    <option value>All Products</option>
+                    <option value="inStock">In Stock</option>
+                    <option value="outOfStock">Out of Stock</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Reset Button -->
+              <div class="mt-6">
+                <button
+                  id="resetButton"
+                  class="px-4 py-2 bg-zinc-800 text-white rounded-lg transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Product Grid -->
+          <div class="md:w-3/4">
+            <!-- Search Bar -->
+            <div class="mb-6 flex-1">
+              <div class="flex items-center">
+                <input
+                  type="text"
+                  id="searchInput"
+                  class="h-10 flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                  placeholder="Search products..."
+                />
+                <button
+                  id="searchButton"
+                  class="h-10 px-4 py-2 bg-zinc-800 text-white rounded-r-lg transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include("../partials/footer") %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Cache DOM elements
+          const productGrid = document.getElementById('productGrid');
+          const searchInput = document.getElementById('searchInput');
+          const searchButton = document.getElementById('searchButton');
+          const sortFilter = document.getElementById('sortFilter');
+          const typeFilter = document.getElementById('catType');
+          const sizeFilter = document.getElementById('size');
+          const minPriceFilter = document.getElementById('minPrice');
+          const maxPriceFilter = document.getElementById('maxPrice');
+          const stockFilter = document.getElementById('stockFilter');
+          const resetButton = document.getElementById('resetButton');
+
+        
+          // Function to apply all filters
+          function applyFilters() {
+              let filteredProducts = [...originalProducts];
+
+              // Search filter
+              const searchTerm = searchInput.value.toLowerCase().trim();
+              if (searchTerm) {
+                  filteredProducts = filteredProducts.filter(product =>
+                      product.productName.toLowerCase().includes(searchTerm) ||
+                      product.brand.toLowerCase().includes(searchTerm)
+                  );
+              }
+
+              // Gender filter
+              if (typeFilter.value) {
+                  filteredProducts = filteredProducts.filter(product =>
+                      product.type.toLowerCase() === typeFilter.value.toLowerCase()
+                  );
+              }
+
+              // Color filter
+              if (sizeFilter.value) {
+                  filteredProducts = filteredProducts.filter(product =>
+                      product.size.toLowerCase() === sizeFilter.value.toLowerCase()
+                  );
+              }
+
+              // Price range filter
+              const minPrice = Number(minPriceFilter.value);
+              const maxPrice = Number(maxPriceFilter.value);
+              if (minPrice > 0) {
+                  filteredProducts = filteredProducts.filter(product =>
+                      product.discountPrice >= minPrice
+                  );
+              }
+              if (maxPrice > 0) {
+                  filteredProducts = filteredProducts.filter(product =>
+                      product.discountPrice <= maxPrice
+                  );
+              }
+
+              // Stock filter
+              if (stockFilter.value) {
+                  filteredProducts = filteredProducts.filter(product => {
+                      if (stockFilter.value === 'inStock') return product.stock > 0;
+                      if (stockFilter.value === 'outOfStock') return product.stock === 0;
+                      return true;
+                  });
+              }
+
+              // Sort products
+              switch(sortFilter.value) {
+                  case 'priceLowToHigh':
+                      filteredProducts.sort((a, b) => a.discountPrice - b.discountPrice);
+                      break;
+                  case 'priceHighToLow':
+                      filteredProducts.sort((a, b) => b.discountPrice - a.discountPrice);
+                      break;
+                  case 'ratingHighToLow':
+                      filteredProducts.sort((a, b) => b.rating - a.rating);
+                      break;
+                  case 'newArrivals':
+                      filteredProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                      break;
+                  default:
+                      // Keep original order
+                      break;
+              }
+
+              renderProducts(filteredProducts);
+          }
+
+          // Function to render products
+          function renderProducts(productsToRender) {
+              if (productsToRender.length === 0) {
+                  productGrid.innerHTML = `
+                      <div class="col-span-full text-center py-8">
+                          <p class="text-gray-500">No products found matching your criteria</p>
+                      </div>
+                  `;
+                  return;
+              }
+
+              productGrid.innerHTML = productsToRender.map(product => `
+                  <a href="/product/${product._id}" 
+                     class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 group">
+                      <div class="relative aspect-square overflow-hidden">
+                          <img
+                              src="${product.imageUrl[0]}"
+                              alt="${product.productName}"
+                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                          >
+                          ${product.discountPrice < product.price ? `
+                              <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                  -${Math.round((product.price - product.discountPrice) / product.price * 100)}%
+                              </div>
+                          ` : ''}
+                      </div>
+                      <div class="p-3">
+                          <h2 class="text-gray-800 font-medium text-base mb-2 truncate">
+                              ${product.productName}
+                          </h2>
+                          <div class="flex items-baseline gap-2">
+                              <span class="text-lg font-bold text-gray-900">₹${product.discountPrice}</span>
+                              ${product.discountPrice < product.price ? `
+                                  <span class="text-sm text-gray-500 line-through">₹${product.price}</span>
+                                  <span class="text-xs text-green-600 font-medium">
+                                      ${Math.round((product.price - product.discountPrice) / product.price * 100)}% off
+                                  </span>
+                              ` : ''}
+                          </div>
+                      </div>
+                  </a>
+              `).join('');
+          }
+
+          // Populate color filter options
+          function populateFilterOptions() {
+              // Get unique colors
+              const sizes = [...new Set(originalProducts.map(p => p.size))].sort();
+              
+              // Clear existing options except the first one (All)
+              while (sizeFilter.options.length > 1) {
+                  sizeFilter.remove(1);
+              }
+
+              // Add color options
+              sizes.forEach(size => {
+                  if (size) { // Only add if color is not null/empty
+                      const option = new Option(
+                          size.charAt(0).toUpperCase() + color.slice(1).toLowerCase(), 
+                          size.toLowerCase()
+                      );
+                      sizeFilter.add(option);
+                  }
+              });
+          }
+
+          // Event listeners
+          searchButton.addEventListener('click', applyFilters);
+          searchInput.addEventListener('keyup', (e) => {
+              if (e.key === 'Enter') applyFilters();
+          });
+          
+          // Add input event listeners for immediate filtering
+          [sortFilter, typeFilter, sizeFilter, stockFilter].forEach(filter => {
+              filter.addEventListener('change', applyFilters);
+          });
+
+          // Add debounced event listeners for price inputs
+          let priceTimeout;
+          [minPriceFilter, maxPriceFilter].forEach(input => {
+              input.addEventListener('input', () => {
+                  clearTimeout(priceTimeout);
+                  priceTimeout = setTimeout(applyFilters, 500);
+              });
+          });
+
+          // Reset filters
+          resetButton.addEventListener('click', () => {
+              searchInput.value = '';
+              sortFilter.value = 'default';
+              typeFilter.value = '';
+              sizeFilter.value = '';
+              minPriceFilter.value = '';
+              maxPriceFilter.value = '';
+              stockFilter.value = '';
+              renderProducts(originalProducts);
+          });
+
+          // Initialize
+          populateFilterOptions();
+      });
+    </script>
+  </body>
+</html>

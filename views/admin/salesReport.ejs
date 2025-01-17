@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report - Admin</title>
+    <link rel="stylesheet" href="/tailwindcss/output.css" />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+</head>
+<body class="mybg-green">
+    <%- include('../partials/sidebar') %>
+
+    <div class="p-4 sm:ml-64">
+        <div class="p-4 mt-14">
+            <!-- Main Content -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <!-- Filter Section -->
+                
+
+                <!-- Metrics Section -->
+             
+
+                <!-- Chart -->
+                <!-- <div class="mb-8 bg-white p-6 rounded-xl shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Sales Trend</h3>
+                    <canvas id="salesChart"></canvas>
+                </div> -->
+
+                <!-- Download Options -->
+                <div class="flex gap-4 mb-6">
+                    <button onclick="downloadReport('excel')" 
+                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-file-excel mr-2"></i>Download Excel
+                    </button>
+                    <button onclick="downloadReport('pdf')" 
+                            class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                    </button>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="overflow-x-auto bg-white rounded-xl shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Order ID
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Customer
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Payment Method
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Payment Status
+                                </th>
+                            </tr>
+                        </thead>
+                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      
+        const dates = Object.keys(dailyData);
+        const sales = dates.map(date => {
+            const dayData = dailyData[date];
+            return {
+                orders: dayData.orders,
+                sales: dayData.sales,
+                discount: dayData.discount,
+                netRevenue: dayData.netRevenue
+            };
+        });
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Daily Sales',
+                    data: sales,
+                    borderColor: 'rgb(0, 0, 0)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Filter Functions
+        function setPeriod(period) {
+            window.location.href = `/admin/sales-report?period=${period}`;
+        }
+
+        async function applyDateFilter() {
+            try {
+                const startDateStr = document.getElementById('startDate').value;
+                const endDateStr = document.getElementById('endDate').value;
+                
+                // Create dates and set to start and end of day
+                const startDate = new Date(startDateStr);
+                startDate.setHours(0, 0, 0, 0);
+                
+                const endDate = new Date(endDateStr);
+                endDate.setHours(23, 59, 59, 999);
+                
+                const today = new Date();
+                today.setHours(23, 59, 59, 999);
+
+                // Client-side validation
+                if (!startDateStr || !endDateStr) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Dates',
+                        text: 'Please select both start and end dates',
+                        confirmButtonColor: '#000000'
+                    });
+                    return;
+                }
+
+                if (startDate > today) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Date',
+                        text: 'Start date cannot be in the future',
+                        confirmButtonColor: '#000000'
+                    });
+                    return;
+                }
+
+                if (endDate < startDate) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Date Range',
+                        text: 'End date must be after or equal to start date',
+                        confirmButtonColor: '#000000'
+                    });
+                    return;
+                }
+
+                window.location.href = `/admin/sales-report?startDate=${startDateStr}&endDate=${endDateStr}`;
+
+            } catch (error) {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error applying filter',
+                    confirmButtonColor: '#000000'
+                });
+            }
+        }
+
+        // Download Functions
+        async function downloadReport(type) {
+            try {
+                const startDateStr = document.getElementById('startDate').value;
+                const endDateStr = document.getElementById('endDate').value;
+                
+                if (!startDateStr || !endDateStr) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Dates',
+                        text: 'Please select both start and end dates',
+                        confirmButtonColor: '#000000'
+                    });
+                    return;
+                }
+
+                const response = await fetch(`/admin/sales-report/download-${type}?startDate=${startDateStr}&endDate=${endDateStr}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Download failed');
+                }
+
+                if (type === 'excel') {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `sales-report-${startDateStr}-${endDateStr}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                } else {
+                    window.location.href = `/admin/sales-report/download-${type}?startDate=${startDateStr}&endDate=${endDateStr}`;
+                }
+            } catch (error) {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Download Failed',
+                    text: error.message || 'Error downloading report',
+                    confirmButtonColor: '#000000'
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Wishlist - Onyx</title>
+    <link rel="stylesheet" href="/tailwindcss/output.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-[##FFF6F4]">
+    <%- include("../partials/nav") %>
+
+    <div class="container mx-auto px-4 py-8 mt-28">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">My Wishlist</h1>
+
+
+                        
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        async function removeFromWishlist(productId) {
+            try {
+                // Prevent event propagation
+                event.preventDefault();
+                event.stopPropagation();
+
+                const response = await fetch(`/wishlist/remove/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Remove item from UI
+                    const item = document.getElementById(`wishlist-item-${productId}`);
+                    item.style.opacity = '0';
+                    item.style.transform = 'scale(0.95)';
+                    item.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        item.remove();
+                        // If wishlist is empty, reload page to show empty state
+                        if (document.querySelectorAll('[id^="wishlist-item-"]').length === 0) {
+                            window.location.reload();
+                        }
+                    }, 300);
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Removed from wishlist',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error removing from wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        }
+
+        async function addToCart(productId) {
+            try {
+                // Prevent event propagation
+                event.preventDefault();
+                event.stopPropagation();
+
+                const response = await fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId, quantity: 1 })
+                });
+
+                const data = await response.json();
+                
+                // Check if product is not active
+                if (data.message && data.message.includes('not available')) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Product Unavailable',
+                        text: 'This product is currently not available',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    // Optionally reload the page to update the UI
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                    return;
+                }
+                
+                // If the response includes a success message, show success alert
+                if (data.message && data.message.includes('added to cart')) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                } else if (data.message && data.message.includes('Maximum limit')) {
+                    // Handle quantity limit error
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Quantity Limit Reached',
+                        text: data.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to add to cart');
+                }
+            } catch (error) {
+                console.error('Cart error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error adding to cart',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        }
+
+        async function toggleWishlist(productId) {
+            try {
+                // Check if product is in wishlist
+                const checkResponse = await fetch(`/wishlist/check/${productId}`);
+                const checkData = await checkResponse.json();
+
+                if (checkData.success) {
+                    if (checkData.isInWishlist) {
+                        // Remove from wishlist
+                        const response = await fetch(`/wishlist/remove/${productId}`, {
+                            method: 'DELETE'
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Update UI - change heart to outline
+                            document.querySelector(`#wishlist-btn-${productId} i`)
+                                .classList.replace('fas', 'far');
+                        }
+                    } else {
+                        // Add to wishlist
+                        const response = await fetch('/wishlist/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ productId })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Update UI - change heart to solid
+                            document.querySelector(`#wishlist-btn-${productId} i`)
+                                .classList.replace('far', 'fas');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Wishlist toggle error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error updating wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+        }
+
+        function showUnavailableMessage() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Product Unavailable',
+                text: 'This product is currently not available in our store',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+    </script>
+</body>
+
+</html>
