@@ -106,17 +106,17 @@ const postSignUp = async (req, res) => {
         // Check if user exists
         const existingUser = await userSchema.findOne({ email });
 
-        console.log(existingUser);
+        // console.log(existingUser);
 
         if (existingUser && !existingUser.isVerified) {
 
             await userSchema.deleteOne({ _id: existingUser._id });
             
         } else if (existingUser) {
-            return res.render('user/signup', {
-                message: "Email Already registered.",
-                alertType: "error",
-            });
+            return res.json({
+                success: false,
+                message: 'User already exists'
+            })
         }
 
         const otp = generateOTP();
