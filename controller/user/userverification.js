@@ -3,9 +3,10 @@ import bcrypt from 'bcrypt'
 import passport from 'passport';
 import { generateOTP, sendOTPEmail } from '../../utils/sendOTP.js'
 import { get } from 'mongoose';
+import e from 'express';
 
 const saltRounds = 10;
-
+ 
 
 const getLogin = (req, res) => {
     res.render('user/login',{error:null});
@@ -104,16 +105,16 @@ const postSignUp = async (req, res) => {
 
         // Check if user exists
         const existingUser = await userSchema.findOne({ email });
-        
+
+        console.log(existingUser);
+
         if (existingUser && !existingUser.isVerified) {
+
             await userSchema.deleteOne({ _id: existingUser._id });
+            
         } else if (existingUser) {
-            let message = existingUser.email === email ? "Email already registered" : "Phone number already registered";
-            if (!existingUser.password) {
-                message = "This email is linked to a Google login. Please log in with Google.";
-            }
             return res.render('user/signup', {
-                message,
+                message: "Email Already registered.",
                 alertType: "error",
             });
         }
