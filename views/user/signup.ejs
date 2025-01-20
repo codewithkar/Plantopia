@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="tailwindcss/output.css" />
     <title>User Signup</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <link
       rel="stylesheet"
@@ -14,6 +16,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
   </head>
 
   <body class="bg-gray-300">
@@ -335,7 +338,7 @@
                 icon: '<%= alertType === "error" ? "error" : "success" %>',
                 title: '<%= alertType === "error" ? "Error" : "Success" %>',
                 text: '<%= message %>',
-                timer: 3000,
+                timer: 5000,
                 timerProgressBar: true
             });
         <% } %>

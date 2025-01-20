@@ -175,6 +175,22 @@
                 </button>
               </div>
             </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                <% products.forEach(function(product) { %>
+                  <a href="/product/<%= product._id %>">
+                  <div class="product-card bg-white p-3 rounded-lg shadow-md animate-slideUp">
+                    <img
+                    src="<%= product.imageUrl[0] %>"
+                    alt="<%= product.productName %>"
+                    class="product-image w-full h-48 object-cover rounded-md mb-4"
+                    />
+                    <h3 class="text-lg font-semibold text-gray-800"><%= product.productName %></h3>
+                    <p class="text-xl font-bold text-green-600 price-highlight">₹<%= product.price %></p>
+                  </div>
+                  </a>
+                <% }); %>
+                </div> 
+            
 
           </div>
         </div>
