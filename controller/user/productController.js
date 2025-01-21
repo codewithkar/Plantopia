@@ -7,9 +7,9 @@ const getProductDetails = async (req, res) => {
         const productId = req.params.id;
         const product = await Product.findById(productId)
             .populate('categoriesId');
-
+        
         if (!product) {
-            return res.status(404).redirect('/home');
+            res.status(404).render('user/productNotFound');
         }
         // Calculate final price with demo discount
         const discountAmount = product.price * 0.20; // 20% discount
@@ -58,7 +58,7 @@ const getProductDetails = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching product details:', error);
-        res.status(500).redirect('/home');
+        res.status(500).render('user/productNotFound');
     }
 };
 

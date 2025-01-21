@@ -134,7 +134,7 @@
         <div class="bg-white p-8 rounded-lg shadow-xl w-96">
             <h3 class="text-xl font-semibold mb-4">Enter OTP</h3>
             <p class="text-sm text-gray-600 mb-4">Please enter the OTP sent to your email</p>
-            
+            <div class="timer">Time Remaining: <span id="countdown">60</span> seconds</div>
             <div class="flex gap-2 mb-4">
                 <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center border-2 rounded-lg" />
                 <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center border-2 rounded-lg" />
@@ -382,6 +382,7 @@
         document.getElementById('verifyOtp').addEventListener('click', async function() {
             const otp = Array.from(otpInputs).map(input => input.value).join('');
             const email = document.getElementById('email').value;
+            
             
             try {
                 const response = await fetch('/validate-otp', {

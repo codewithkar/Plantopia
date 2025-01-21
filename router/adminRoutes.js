@@ -1,7 +1,7 @@
 import express from 'express';
 import adminController from '../controller/admin/adminController.js';
 import adminMiddleware from '../middlewares/adminMiddleware.js';  // Add this import
-import productController from '../controller/admin/ProductController.js';
+import productController from '../controller/admin/productController.js';
 import userController from '../controller/admin/adminUserController.js';
 import categoryController from '../controller/admin/categoryController.js';
 import orderController from '../controller/admin/orderController.js';
