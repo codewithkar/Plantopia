@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Onyx - Personal Information</title>
+    <title>Plantopia - Personal Information</title>
     <link rel="stylesheet" href="tailwindcss/output.css" />
     <link
       rel="stylesheet"
@@ -42,7 +42,7 @@
                 type="text"
                 placeholder="Enter your first name"
                 name="firstName"
-                value="Karthika""
+                value="<%= user.firstName %>"
               />
             </div>
             <div>
@@ -58,7 +58,7 @@
                 type="text"
                 placeholder="Enter your last name"
                 name="lastName"
-                value="KarthikaKalesh"
+                value="<%= user.lastName %>"
               />
             </div>
             <div>
@@ -73,7 +73,7 @@
                 id="email"
                 type="email"
                 name="email"
-                value="Karthika@gmail.com"
+                value="<%= user.email %>"
                 readonly
                 disabled
               />

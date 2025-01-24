@@ -8,7 +8,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     />
-    <title>Checkout - Onyx</title>
+    <title>Checkout - Plantopia</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -67,28 +67,11 @@
                     
                     <div class="space-y-4">
                         <!-- Wallet Payment Option -->
-                        <label class="flex items-center gap-3 p-3 border rounded-lg <%= wallet.balance >= total ? 'hover:bg-gray-50' : 'opacity-60' %>">
-                            <input type="radio" name="paymentMethod" value="wallet" 
-                                   <%= wallet.balance >= total ? '' : 'disabled' %>>
-                            <div class="flex flex-col">
-                                <span class="flex items-center gap-2">
-                                    <i class="fas fa-wallet"></i> Pay using Wallet
-                                    <% if (wallet.balance >= total) { %>
-                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                            Sufficient Balance
-                                        </span>
-                                    <% } %>
-                                </span>
-                                <span class="text-sm text-gray-500">
-                                    Available: ₹<%= wallet.balance.toFixed(2) %>
-                                </span>
-                            </div>
-                        </label>
 
                         <!-- COD Payment Option -->
                         <label id="codOption" 
                                class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-300"
-                               data-final-total="<%= finalTotal %>">
+                               data-final-total="<%= totalPrice %>">
                             <input type="radio" 
                                    name="paymentMethod" 
                                    value="cod" 
@@ -106,15 +89,7 @@
                         </label>
 
                         <!-- Online Payment Option -->
-                        <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
-                            <input type="radio" name="paymentMethod" value="online">
-                            <div class="flex flex-col">
-                                <span class="flex items-center gap-2">
-                                    <i class="fas fa-credit-card"></i> Online Payment
-                                </span>
-                                <span class="text-sm text-gray-500">Pay using Card/UPI/Netbanking</span>
-                            </div>
-                        </label>
+                       
                     </div>
                 </div>
             </div>
@@ -136,57 +111,28 @@
                                 <div class="flex-1">
                                     <h4 class="font-medium"><%= item.product.productName %></h4>
                                     <p class="text-gray-500 text-sm">Qty: <%= item.quantity %></p>
-                                    <p class="text-gray-800">₹<%= item.price.toFixed(2) %></p>
-                                    <% if (item.discountedPrice && item.discountedPrice < item.price) { %>
-                                        <p class="text-green-600 text-sm">
-                                            Discounted: ₹<%= item.discountedPrice.toFixed(2) %>
-                                        </p>
-                                    <% } %>
+                                    <p class="text-gray-800">₹<%= item.total %></p>
+                                    
                                 </div>
                             </div>
                         <% }); %>
                     </div>
 
                     <!-- Coupon Section -->
-                    <div class="mb-6">
-                        <button 
-                            onclick="openCouponModal()"
-                            class="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                        >
-                            <i class="fas fa-ticket-alt"></i>
-                            Apply Coupon
-                        </button>
-                        <div id="appliedCouponInfo" class="hidden mt-3 p-3 bg-green-50 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-green-800 font-medium" id="appliedCouponCode"></p>
-                                    <p class="text-green-600 text-sm" id="discountInfo"></p>
-                                </div>
-                                <button 
-                                    onclick="removeCoupon()"
-                                    class="text-red-500 hover:text-red-600"
-                                >
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                   
 
                     <!-- Price Breakdown -->
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>₹<span id="subtotal"><%= total.toFixed(2) %></span></span>
+                            <span>₹<span id="subtotal"><%= totalPrice.toFixed(2) %></span></span>
                         </div>
                         
-                        <div id="discountRow" class="flex justify-between <%= locals.discount ? '' : 'hidden' %>">
-                            <span>Discount:</span>
-                            <span class="text-green-500">-₹<span id="discountAmount"><%= (locals.discount || 0).toFixed(2) %></span></span>
-                        </div>
+                        
                         
                         <div class="flex justify-between font-bold">
                             <span>Total Amount:</span>
-                            <span>₹<span id="finalTotal"><%= (total - (locals.discount || 0)).toFixed(2) %></span></span>
+                            <span>₹<span id="finalTotal"><%= totalPrice.toFixed(2) %></span></span>
                         </div>
                     </div>
 
@@ -213,53 +159,158 @@
     <%- include('../partials/footer') %>
 
     <!-- Add this coupon modal at the end of the body -->
-    <div id="couponModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
-                <!-- Modal Header -->
-                <div class="p-4 border-b">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-800">Available Coupons</h3>
-                        <button onclick="closeCouponModal()" class="text-gray-400 hover:text-gray-500">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="overflow-y-auto p-4 space-y-4" style="max-height: calc(80vh - 120px);">
-                    <!-- Available Coupons Section -->
-                    <div id="activeCoupons" class="space-y-3">
-                        <div id="activeCouponsList" class="space-y-3">
-                            <!-- Active coupons will be inserted here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Add this section for wallet balance display -->
-    <div class="mb-6 p-4 bg-gray-50 rounded-xl">
-        <div class="flex justify-between items-center">
-            <div>
-                <h3 class="font-medium text-gray-800">Wallet Balance</h3>
-                <p class="text-2xl font-bold <%= wallet.balance >= total ? 'text-green-600' : 'text-gray-600' %>">
-                    ₹<%= wallet.balance.toFixed(2) %>
-                </p>
-            </div>
-            <% if (wallet.balance < total) { %>
-                <div class="text-right">
-                    <p class="text-sm text-red-600 mb-2">Insufficient balance</p>
-                    <button onclick="addFunds()" 
-                            class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
-                        Add Funds
-                    </button>
-                </div>
-            <% } %>
-        </div>
-    </div>
-
    
+    <script>
+        let appliedCoupon = null;
+        let currentDiscount = 0;
+        const cartTotal = <%= totalPrice %>;
+
+        function updateTotalWithDiscount(discount) {
+            const finalTotalElement = document.getElementById('finalTotal');
+            const discountElement = document.getElementById('discountAmount');
+            const discountRow = document.getElementById('discountRow');
+            
+            if (discount > 0) {
+                discountRow.classList.remove('hidden');
+                discountElement.textContent = discount.toFixed(2);
+                finalTotalElement.textContent = (cartTotal - discount).toFixed(2);
+            } else {
+                discountRow.classList.add('hidden');
+                discountElement.textContent = '0';
+                finalTotalElement.textContent = cartTotal.toFixed(2);
+            }
+        }
+
+        // Add this function to get the current total with discount
+        function getDiscountedTotal() {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            const discountAmount = parseFloat(document.getElementById('discountAmount').textContent) || 0;
+            return subtotal - discountAmount;
+        }
+
+
+        async function placeOrder() {
+            try {
+                // Check if address is selected
+                const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+                if (!selectedAddress) {
+                    throw new Error('Please select a delivery address');
+                }
+
+                // Check if payment method is selected
+                const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+                if (!selectedPayment) {
+                    throw new Error('Please select a payment method');
+                }
+
+                const paymentMethod = selectedPayment.value;
+                const finalAmount = parseFloat(document.getElementById('finalTotal').textContent);
+
+                // Validate COD payment method
+                if (paymentMethod === 'cod' && finalAmount > 9000) {
+                    throw new Error('Cash on Delivery is not available for orders above ₹9,000. Please choose a different payment method.');
+                }
+
+                let response;
+                 if (paymentMethod === 'cod') {
+                    response = await fetch('/checkout/place-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            addressId: selectedAddress.value,
+                            paymentMethod: 'cod',
+                            couponCode: document.getElementById('appliedCouponCode')?.textContent
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Order Placed Successfully!',
+                            text: `Order ID: ${data.orderId}`,
+                            confirmButtonColor: '#000000',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: true
+                        });
+                        window.location.href = `/orders?success=true&orderId=${data.orderId}`;
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } 
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message,
+                    confirmButtonColor: '#000000'
+                });
+            }
+        }
+
+        
+        function updateCODAvailability(finalAmount) {
+            const codOption = document.getElementById('codOption');
+            const codPayment = document.getElementById('codPayment');
+            const codAvailability = document.getElementById('codAvailability');
+            const codMessage = document.getElementById('codMessage');
+
+            if (finalAmount > 9000) {
+                codOption.classList.add('opacity-60');
+                codOption.classList.remove('hover:bg-gray-50');
+                codPayment.disabled = true;
+                codAvailability.classList.remove('hidden');
+                codAvailability.classList.add('bg-red-100', 'text-red-800');
+                codAvailability.textContent = 'Not Available';
+                codMessage.textContent = 'Not available for orders above ₹9,000';
+                
+                // If COD was selected, switch to a different payment method
+                if (codPayment.checked) {
+                    document.querySelector('input[name="paymentMethod"][value="online"]').checked = true;
+                }
+            } else {
+                codOption.classList.remove('opacity-60');
+                codOption.classList.add('hover:bg-gray-50');
+                codPayment.disabled = false;
+                codAvailability.classList.add('hidden');
+                codMessage.textContent = 'Pay when you receive the order';
+            }
+        }
+
+        // Update COD availability when coupon is applied or removed
+        function updatePaymentMethodsAfterCoupon(finalAmount) {
+            updateCODAvailability(finalAmount);
+        }
+
+        // Initial update
+        document.addEventListener('DOMContentLoaded', function() {
+            const finalTotal = parseFloat(document.getElementById('codOption').dataset.finalTotal);
+            updateCODAvailability(finalTotal);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for success parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const orderId = urlParams.get('orderId');
+            
+            if (success === 'true' && orderId) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Order Placed Successfully!',
+                    text: `Your order (${orderId}) has been placed successfully.`,
+                    confirmButtonColor: '#000000'
+                });
+                
+                // Clean up URL without refreshing the page
+                window.history.replaceState({}, document.title, '/orders');
+            }
+        });
+    </script>
 </body>
 </html> 

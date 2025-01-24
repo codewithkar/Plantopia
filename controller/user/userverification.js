@@ -225,11 +225,6 @@ const postResendOtp = async (req, res) => {
     }
 }
 
-
-const forgotPassword = (req, res) => {
-    res.render('user/forgotPassword');
-}
-
 const getLogout = (req, res) => {
     req.session.destroy(() => {
         res.redirect('/login');
@@ -302,8 +297,7 @@ const getGoogleCallback = (req, res) => {
 export default { 
     getLogin, 
     getSignin, 
-    getLogout, 
-    forgotPassword, 
+    getLogout,  
     postSignUp, 
     postOtp, 
     postResendOtp, 
