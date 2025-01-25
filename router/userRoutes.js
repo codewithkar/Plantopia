@@ -65,9 +65,14 @@ router.post('/cart/add', userMiddleware.checkSession, cartController.addToCart);
 router.post('/cart/update-quantity', userMiddleware.checkSession, cartController.updateQuantity);
 router.delete('/cart/remove/:productId', userMiddleware.checkSession,cartController.removeFromCart);
 
+//checkout
 router.get('/checkout', userMiddleware.checkSession,checkoutController.loadCheckoutPage);
 router.post('/checkout/place-order', userMiddleware.checkSession, checkoutController.placeOrder);
 
+//Orders
+router.get('/orders', userMiddleware.checkSession, orderController.getOrders);
+router.post('/orders/:orderId/cancel', userMiddleware.checkSession, orderController.cancelOrder);
+router.post('/orders/:orderId/return', userMiddleware.checkSession, orderController.requestReturn);
 
 
 

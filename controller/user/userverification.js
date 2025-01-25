@@ -226,9 +226,9 @@ const postResendOtp = async (req, res) => {
 }
 
 const getLogout = (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
+    req.session.user = null;
+    req.session.userEmail = null;
+    res.redirect('/login');
 }
 
 const getGoogle = (req, res, next) => {

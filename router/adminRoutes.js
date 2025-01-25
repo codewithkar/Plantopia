@@ -43,6 +43,9 @@ router.delete('/category/delete/?id', adminMiddleware.checkSession, categoryCont
 
 // order Routes
 router.get('/orders',adminMiddleware.checkSession,orderController.getOrderList)
+router.post('/orders/:orderId/status', adminMiddleware.checkSession, orderController.updateOrderStatus);
+
+
 router.get('/offers',adminMiddleware.checkSession,offerController.getOfferList)
 router.get('/coupon',adminMiddleware.checkSession,couponController.getCouponList)
 router.get('/sales-report',adminMiddleware.checkSession,salesReportController.getReport)

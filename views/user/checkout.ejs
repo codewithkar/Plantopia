@@ -111,7 +111,7 @@
                                 <div class="flex-1">
                                     <h4 class="font-medium"><%= item.product.productName %></h4>
                                     <p class="text-gray-500 text-sm">Qty: <%= item.quantity %></p>
-                                    <p class="text-gray-800">₹<%= item.total %></p>
+                                    <p class="text-gray-800">₹<%= item.price * item.quantity %></p>
                                     
                                 </div>
                             </div>
@@ -158,11 +158,6 @@
 
     <%- include('../partials/footer') %>
 
-    <!-- Add this coupon modal at the end of the body -->
-    
-
-    <!-- Add this section for wallet balance display -->
-   
     <script>
         let appliedCoupon = null;
         let currentDiscount = 0;
@@ -224,7 +219,6 @@
                         body: JSON.stringify({
                             addressId: selectedAddress.value,
                             paymentMethod: 'cod',
-                            couponCode: document.getElementById('appliedCouponCode')?.textContent
                         })
                     });
                     const data = await response.json();

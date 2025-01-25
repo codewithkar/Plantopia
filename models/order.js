@@ -25,14 +25,6 @@ const OrderSchema = new mongoose.Schema({
             type: Number,
             required: true
         },
-        discountedPrice: {
-            type: Number,
-            default: 0
-        },
-        subtotal: {
-            type: Number,
-            required: true
-        }
     }],
     totalAmount: {
         type: Number,
@@ -56,7 +48,7 @@ const OrderSchema = new mongoose.Schema({
         },
         paymentStatus: {
             type: String,
-            enum: ['processing', 'completed', 'failed', 'refunded', 'cancelled', 'refund processing'],
+            enum: ['pending','processing', 'completed', 'failed', 'refunded', 'cancelled', 'refund processing'],
             default: null
         },
     },

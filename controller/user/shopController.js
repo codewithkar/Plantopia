@@ -13,20 +13,21 @@ const getShop = async (req, res) => {
             const searchRegx = new RegExp(searchQuery, 'i');
             const matchingCategories = await Category.find({ name: searchRegx }).select('_id');
             const categoryIds = matchingCategories.map(category => category._id);
- 
-            products = await Product.find({ isActive: true,
+
+            products = await Product.find({
+                isActive: true,
                 $or: [
-                    { name: searchRegx }, 
+                    { name: searchRegx },
                     { description: searchRegx },
-                    { type:searchQuery },
+                    { type: searchQuery },
                     { categoriesId: { $in: categoryIds } } // Match products by category IDs
-                ] 
+                ]
             })
-            if(!products || products.length === 0){
-               return res.status(500).render('user/productNotFound');
-                
+            if (!products || products.length === 0) {
+                return res.status(500).render('user/productNotFound');
+
             }
-        }else {
+        } else {
             // Fetch products and populate categories
             products = await Product.find({ isActive: true })
                 .populate({
@@ -35,17 +36,18 @@ const getShop = async (req, res) => {
                 })
                 .sort({ createdAt: -1 });
         }
+        
         // Filter out products whose populated categories are null or empty
         const filteredProducts = products.filter(product => product.categoriesId);
 
-        res.render('user/shop', { 
+        res.render('user/shop', {
             products: filteredProducts.map(product => product.toObject()),
             title: 'Shop'
         });
-        
+
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.render('user/shop', { 
+        res.render('user/shop', {
             products: [],
             title: 'SHOP'
         });
@@ -53,4 +55,4 @@ const getShop = async (req, res) => {
 };
 
 
-export default { getShop} 
+export default { getShop } 
