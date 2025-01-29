@@ -13,6 +13,7 @@ import productController from '../controller/user/productController.js';
 import passwordController from '../controller/user/passwordController.js';
 import checkoutController from '../controller/user/checkoutController.js';
 import userMiddleware from '../middlewares/userMiddleware.js';
+import sendOtp from '../utils/sendOTP.js'
 
 
 
@@ -35,19 +36,22 @@ router.get('/auth/google/callback', userverification.getGoogleCallback);
 
 //forgot password
 router.get('/forgot-password', userMiddleware.isLogin, passwordController.forgotPassword);
-router.post('/forgot-password/send-otp', passwordController.sendForgotPasswordOTP);
+router.post('/forgot-password/send-otp', sendOtp.otpValidation);
 router.post('/forgot-password/verify-otp', passwordController.verifyForgotPasswordOTP);
 router.post('/forgot-password/reset-password', passwordController.resetPassword);
 
 //Home page
 router.get('/', userHomeController.getHome);
-router.get('/home', userMiddleware.checkSession,userHomeController.getHome);
+router.get('/home', userHomeController.getHome);
 
 //Shop
-router.get('/shop', userMiddleware.checkSession,shopController.getShop);
+router.get('/shop', shopController.getShop);
+router.get('/shop/filtered', shopController.getFilteredProducts);
+router.get('/shop/search', shopController.searchProducts);
+
 
 //Product
-router.get('/product/:id', userMiddleware.checkSession, productController.getProductDetails);
+router.get('/product/:id', productController.getProductDetails);
 
 //Profile
 router.get('/profile', userMiddleware.checkSession,profileController.getProfile);
@@ -61,7 +65,7 @@ router.put('/address/:id', userMiddleware.checkSession, addressController.editAd
 
 //Cart
 router.get('/cart', userMiddleware.checkSession,cartController.getCart);
-router.post('/cart/add', userMiddleware.checkSession, cartController.addToCart);
+router.post('/cart/add', userMiddleware.checkCartSession, cartController.addToCart);
 router.post('/cart/update-quantity', userMiddleware.checkSession, cartController.updateQuantity);
 router.delete('/cart/remove/:productId', userMiddleware.checkSession,cartController.removeFromCart);
 
@@ -76,7 +80,13 @@ router.post('/orders/:orderId/return', userMiddleware.checkSession, orderControl
 
 
 
-router.get('/wishlist', userMiddleware.checkSession,wishListController.getwishList);
+router.get('/wishlist', userMiddleware.checkSession, wishListController.getWishlist);
+
+router.post('/wishlist/add', userMiddleware.checkSession, wishListController.addToWishlist);
+
+router.delete('/wishlist/remove/:productId', userMiddleware.checkSession, wishListController.removeFromWishlist);
+
+router.get('/wishlist/check/:productId', userMiddleware.checkSession, wishListController.checkWishlistStatus);
 
 router.get('/orders', userMiddleware.checkSession,orderController.getOrders);
 router.get('/wallet', userMiddleware.checkSession,walletController.getWallet);

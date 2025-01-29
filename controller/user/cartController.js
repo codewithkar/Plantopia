@@ -78,10 +78,12 @@ const getCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
+        console.log('here');
+        
         const { productId, quantity } = req.body;
         const userId = req.session.user;
-
-        // Check if product exists and is in stock
+        
+             // Check if product exists and is in stock
         const product = await productSchema.findById(productId).populate('categoriesId');
         if (!product || !product.isActive) {
             return res.status(400).json({
@@ -159,6 +161,8 @@ const addToCart = async (req, res) => {
             total: cart.total
         });
 
+       
+       
     } catch (error) {
         console.error('Error adding to cart:', error);
         res.status(500).json({ message: 'Failed to add product to cart' });

@@ -1,70 +1,70 @@
 import userSchema from '../../models/users.js';
 import bcrypt from 'bcrypt'
 import passport from 'passport';
-import { generateOTP, sendOTPEmail } from '../../utils/sendOTP.js'
+import sendOtp from '../../utils/sendOTP.js'
 
 const saltRounds = 10;
 
 const forgotPassword = (req, res) => {
-    res.render('user/forgotPassword');
+    res.render('user/forgotPassword'); 
 }
 
-const sendForgotPasswordOTP = async (req, res) => {
-    try {
-        const { email } = req.body;
+// const sendForgotPasswordOTP = async (req, res) => {
+//     try {
+//         const { email } = req.body;
 
-        // Check if the user exists
-        const existingUser = await userSchema.findOne({ email });
-        if (!existingUser) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+//         // Check if the user exists
+//         const existingUser = await userSchema.findOne({ email });
+//         if (!existingUser) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
 
-        // Check if the user is verified
-        if (!existingUser.isVerified) {
-            return res.status(403).json({ success: false, message: 'User account is not verified' });
-        }
+//         // Check if the user is verified
+//         if (!existingUser.isVerified) {
+//             return res.status(403).json({ success: false, message: 'User account is not verified' });
+//         }
 
-        // Generate OTP
-        const otp = generateOTP();
-        console.log(`Generated OTP for ${email}: ${otp}`);
+//         // Generate OTP
+//         const otp = generateOTP();
+//         console.log(`Generated OTP for ${email}: ${otp}`);
 
-        // Update or create OTP details for the user
-        await userSchema.updateOne(
-            { email },
-            {
-                $set: {
-                    otp,
-                    otpExpiresAt: Date.now() + 2 * 60 * 1000, // 2 minutes expiry
-                    otpAttempts: 0,
-                },
-            },
-            { upsert: true }
-        );
+//         // Update or create OTP details for the user
+//         await userSchema.updateOne(
+//             { email },
+//             {
+//                 $set: {
+//                     otp,
+//                     otpExpiresAt: Date.now() + 2 * 60 * 1000, // 2 minutes expiry
+//                     otpAttempts: 0,
+//                 },
+//             },
+//             { upsert: true }
+//         );
 
-        // Schedule deletion of OTP after expiry
-        setTimeout(async () => {
-            const user = await userSchema.findOne({ email });
-            if (user && user.otp && Date.now() > user.otpExpiresAt) {
-                await userSchema.updateOne({ email }, { $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 } });
-                console.log(`Expired OTP cleared for ${email}`);
-            }
-        }, 2 * 60 * 1000);
+//         // Schedule deletion of OTP after expiry
+//         setTimeout(async () => {
+//             const user = await userSchema.findOne({ email });
+//             if (user && user.otp && Date.now() > user.otpExpiresAt) {
+//                 await userSchema.updateOne({ email }, { $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 } });
+//                 console.log(`Expired OTP cleared for ${email}`);
+//             }
+//         }, 2 * 60 * 1000);
 
-        // Send OTP email
-        await sendOTPEmail(email, otp);
+//         // Send OTP email
+//         await sendOTPEmail(email, otp);
 
-        res.status(200).json({
-            success: true,
-            message: 'OTP sent successfully',
-        });
-    } catch (error) {
-        console.error('Error in sending OTP:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'OTP sent successfully',
+//         });
+//     } catch (error) {
+//         console.error('Error in sending OTP:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Internal server error',
+//         });
+//     }
+// };
 
 const verifyForgotPasswordOTP = async (req, res) => {
     try {
@@ -142,7 +142,6 @@ const resetPassword = async (req, res) => {
 
 export default { 
     forgotPassword, 
-    sendForgotPasswordOTP,
     verifyForgotPasswordOTP,
     resetPassword,
      

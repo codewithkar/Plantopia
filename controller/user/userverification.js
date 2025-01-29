@@ -1,9 +1,9 @@
 import userSchema from '../../models/users.js'
 import bcrypt from 'bcrypt'
 import passport from 'passport';
-import { generateOTP, sendOTPEmail } from '../../utils/sendOTP.js'
+import sendOTP  from '../../utils/sendOTP.js'
 import { get } from 'mongoose';
-import e from 'express';
+
 
 const saltRounds = 10;
  
@@ -119,7 +119,7 @@ const postSignUp = async (req, res) => {
             })
         }
 
-        const otp = generateOTP();
+        const otp = sendOTP.generateOTP();
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const newUser = new userSchema({
@@ -142,10 +142,10 @@ const postSignUp = async (req, res) => {
             }
         }, 180000);
 
-        await sendOTPEmail(email, otp);
+        await sendOTP.sendOTPEmail(email, otp);
         res.json({ 
             success: true, 
-            message: 'OTP sent successfully',
+            message: 'OTP sent successfully', 
             email: email
         });
     } catch (error) {
@@ -176,11 +176,7 @@ const postOtp = async (req, res) => {
         }
 
         // Increment attempts before validating to prevent brute force
-        user.otpAttempts += 1;
-        if (user.otpAttempts >= 3) {
-            await userSchema.deleteOne({ _id: user._id });
-            return res.status(400).json({ error: 'Too many attempts. Please signup again.' });
-        }
+      
         await user.save();
 
         // If OTP matches, verify user
@@ -212,13 +208,13 @@ const postResendOtp = async (req, res) => {
         const user = await userSchema.findOne({ isVerified: false });
         if (!user) return res.status(400).json({ error: 'User not found' });
 
-        const otp = generateOTP();
+        const otp = sendOTP.generateOTP();
         user.otp = otp;
         user.otpExpiresAt = Date.now() + 120 * 1000;
         user.otpAttempts = 0;
         await user.save();
 
-        await sendOTPEmail(user.email, otp);
+        await sendOTP.sendOTPEmail(user.email, otp);
         res.status(200).json({ message: 'OTP resent' });
     } catch (error) {
         res.status(500).json({ error: 'Resend failed' });
@@ -303,4 +299,4 @@ export default {
     postResendOtp, 
     postLogin, 
     getGoogle,
-    getGoogleCallback };
+    getGoogleCallback }; 

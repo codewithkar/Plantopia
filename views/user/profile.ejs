@@ -113,6 +113,15 @@
             return;
           }
 
+          if (!/^[a-zA-Z]{3,10}$/.test(firstName)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid First Name',
+                    text: 'First name should contain only letters (3-10 characters)'
+                });
+                return;
+            }
+
           if (!lastName.trim()) {
             Swal.fire({
               icon: "error",
@@ -122,6 +131,16 @@
             return;
           }
 
+          if (!/^[a-zA-Z]{1,10}$/.test(lastName)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Last Name',
+                    text: 'Last name should contain only letters (1-10 characters)'
+                });
+                return;
+            }
+
+            
           // Validate fields (excluding email since it's read-only)
           if (!firstName || !lastName) {
             Swal.fire({

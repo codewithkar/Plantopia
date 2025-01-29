@@ -307,7 +307,7 @@
             });
             return;
         }
-
+     
         // Capitalize first letter of address
         data.addressLine1 = data.addressLine1.charAt(0).toUpperCase() + data.addressLine1.slice(1);
         if (data.addressLine2) {
@@ -336,15 +336,16 @@
         }
 
         // City length validation
-        if (data.city.length > 15) {
+        if (data.city.length > 18) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'City name should not exceed 15 characters'
+                text: 'City name should not exceed 18 characters'
             });
             return;
         }
-
+        
+        
         // Capitalize city
         data.city = capitalizeWords(data.city);
 

@@ -6,6 +6,26 @@ const checkSession = (req, res, next) => {
     }
 }
 
+const checkCartSession = (req, res, next) => {
+    try {
+        if (!req.session.user) {
+          return res.status(401).json({ 
+            error: true, 
+            message: 'Authentication required',
+            redirectUrl: '/login'
+          });
+        }
+        next();
+      } catch (error) {
+        res.status(500).json({ 
+          error: true, 
+          message: 'Server error during authentication check' 
+        });
+      }
+
+      
+}
+
 const isLogin  = (req, res, next)=>{
  
     if(req.session.user){
@@ -21,4 +41,4 @@ const isLogin  = (req, res, next)=>{
 
 
 
-export default { isLogin, checkSession}
+export default { isLogin, checkSession, checkCartSession}
