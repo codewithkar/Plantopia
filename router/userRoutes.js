@@ -72,23 +72,36 @@ router.delete('/cart/remove/:productId', userMiddleware.checkSession,cartControl
 //checkout
 router.get('/checkout', userMiddleware.checkSession,checkoutController.loadCheckoutPage);
 router.post('/checkout/place-order', userMiddleware.checkSession, checkoutController.placeOrder);
+router.post('/checkout/create-razorpay-order', userMiddleware.checkSession, checkoutController.createRazorpayOrder);
+router.post('/checkout/verify-payment', userMiddleware.checkSession, checkoutController.verifyPayment);
+
+
+router.post('/checkout/apply-coupon', userMiddleware.checkSession, checkoutController.applyCoupon);
+
+router.post('/checkout/remove-coupon', userMiddleware.checkSession, checkoutController.removeCoupon);
+
+router.get('/checkout/available-coupons', userMiddleware.checkSession, checkoutController.getAvailableCoupons);
 
 //Orders
 router.get('/orders', userMiddleware.checkSession, orderController.getOrders);
-router.post('/orders/:orderId/cancel', userMiddleware.checkSession, orderController.cancelOrder);
-router.post('/orders/:orderId/return', userMiddleware.checkSession, orderController.requestReturn);
+router.post('/orders/:orderId/cancel/:productId', userMiddleware.checkSession, orderController.cancelOrder);
+router.post('/orders/:orderId/items/:productId/return', userMiddleware.checkSession, orderController.requestReturnItem);
 
 
 
 router.get('/wishlist', userMiddleware.checkSession, wishListController.getWishlist);
 
-router.post('/wishlist/add', userMiddleware.checkSession, wishListController.addToWishlist);
+router.post('/wishlist/add', userMiddleware.checkCartSession, wishListController.addToWishlist);
 
 router.delete('/wishlist/remove/:productId', userMiddleware.checkSession, wishListController.removeFromWishlist);
 
 router.get('/wishlist/check/:productId', userMiddleware.checkSession, wishListController.checkWishlistStatus);
 
-router.get('/orders', userMiddleware.checkSession,orderController.getOrders);
+router.get('/wallet', userMiddleware.checkSession, walletController.getWallet);
+
+router.post('/wallet/add-funds', userMiddleware.checkSession, walletController.addFunds);
+
+
 router.get('/wallet', userMiddleware.checkSession,walletController.getWallet);
 router.get('/coupons', userMiddleware.checkSession,couponController.getCoupon);
 router.get('/logout', userverification.getLogout);

@@ -37,6 +37,44 @@
                 <th class="py-3 px-4">Actions</th>
               </tr>
             </thead>
+            <tbody>
+              <% coupons.forEach((coupon) => { %>
+              <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                <td class="py-3 px-4">
+                  <div class="font-medium"><%= coupon.code %></div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-medium"><%= coupon.discountPercentage %>%</div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-medium"><%= new Date(coupon.startDate).toLocaleDateString() %></div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-medium"><%= new Date(coupon.expiryDate).toLocaleDateString() %></div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-1 rounded-full text-xs <%= coupon.isActive ? 'bg-green-500' : 'bg-red-500' %>">
+                    <%= coupon.isActive ? 'Active' : 'Inactive' %>
+                  </span>
+                </td>
+                <td class="py-3 px-4 space-x-3 flex">
+                  <button class="edit-coupon text-yellow-500 hover:text-yellow-300 transition"
+                          data-id="<%= coupon._id %>">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="delete-coupon text-red-500 hover:text-red-300 transition" 
+                          data-id="<%= coupon._id %>">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button class="toggle-status <%= coupon.isActive ? 'text-gray-500' : 'text-green-500' %>" 
+                          data-id="<%= coupon._id %>" 
+                          data-active="<%= coupon.isActive %>">
+                    <i class="fas <%= coupon.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                  </button>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
           </table>
         </div>
       </main>
@@ -203,7 +241,7 @@
                   confirmButtonColor: '#10B981'
               });
           }
-
+          console.log(code)
           if (code.length < 3 || code.length > 10) {
               return Swal.fire({
                   icon: 'error',

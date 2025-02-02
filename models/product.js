@@ -1,6 +1,5 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-// Define the Product Schema
 const productSchema = new mongoose.Schema({
     productName: {
         type: String,
@@ -29,7 +28,7 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minLength: 10,
+        minLength: 20,
         maxLength: 500
     },
     price: {
@@ -49,6 +48,7 @@ const productSchema = new mongoose.Schema({
         min: 0
     },
     imageUrl: [String],
+    
     offer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Offer'
@@ -66,6 +66,7 @@ const productSchema = new mongoose.Schema({
         enum: ['product', 'category', 'none'],
         default: 'none'
     }
-}, { timestamps: true });
+}, 
+{ timestamps: true });
 
 export default mongoose.model("Product", productSchema);

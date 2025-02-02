@@ -1,5 +1,7 @@
 import Product from '../../models/product.js';
 import Category from '../../models/category.js';
+import Offer from '../../models/offers.js'
+import {calculateFinalPrice} from '../../utils/offerCalculator.js'
 
 const getShop = async (req, res) => {
     try {
@@ -18,9 +20,35 @@ const getShop = async (req, res) => {
 
         // Filter out products whose populated categories are null or empty
         const filteredProducts = products.filter(product => product.categoriesId);
+        
+        const offers = await Offer.find({
+            status: 'active',
+            startDate: { $lte: new Date() },
+            endDate: { $gte: new Date() }
+        });
+
+        const processedProducts = filteredProducts.map(product => {
+            const productOffer = offers.find(offer => 
+                offer.productIds && offer.productIds.some(id => id.equals(product._id))
+            );
+            
+            const categoryOffer = offers.find(offer => 
+                offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+            );
+
+            const discountPrice = calculateFinalPrice(product, categoryOffer, productOffer);
+
+            return {
+                ...product.toObject(),
+                price: product.price,
+                discountPrice: discountPrice,
+                hasDiscount: discountPrice < product.price,
+                discountPercentage: Math.round((product.price - discountPrice) / product.price * 100)
+            };
+        });
 
         res.render('user/shop', {
-            products: filteredProducts.map(product => product.toObject()),
+            products: processedProducts,
             title: 'Shop'
         });
 

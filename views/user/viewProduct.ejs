@@ -70,7 +70,7 @@
           <li><span class="text-gray-400">/</span></li>
           <li><a href="/shop" class="text-gray-600 hover:text-black">Shop</a></li>
           <li><span class="text-gray-400">/</span></li>
-          <li class="text-gray-900 font-medium"><%= product.brand %> <%= product.productName %></li>
+          <li class="text-gray-900 font-medium"><%= product.type %> <%= product.productName %></li>
         </ol>
       </nav>
 
@@ -109,7 +109,11 @@
             <div class="space-y-6">
               <!-- Brand & Title -->
               <div>
-                <h1 class="text-3xl font-bold text-gray-900 mt-1"><%= product.productName %></h1>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-8 h-[2px] bg-gray-900"></span>
+                  <span class="text-gray-500 text-sm tracking-wider uppercase"><%= product.category %></span>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900"><%= product.productName %></h1>
               </div>
 
               <!-- Rating -->
@@ -198,34 +202,59 @@
         </div>
 
         <!-- Related Products -->
-        <div class="mt-16">
-          <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">You May Also Like</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            <% relatedProducts.forEach(product => { %>
-              <div class="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
-                <a href="/product/<%= product._id %>" class="block">
-                  <img 
-                    class="w-full h-48 object-cover rounded-lg mb-4"
+        <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-6 pb-4 sm:pb-0">
+          <% relatedProducts.forEach(product => { %>
+            <a href="/product/<%= product._id %>" class="group min-w-[240px] sm:min-w-0">
+              <div class="bg-white rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300">
+                <!-- Product Image -->
+                <div class="relative aspect-square overflow-hidden bg-gray-100">
+                  <img
                     src="<%= product.imageUrl[0] %>"
                     alt="<%= product.productName %>"
+                    class="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
+                    loading="lazy"
                   />
-                  <div class="space-y-2">
-                    <h3 class="font-medium text-gray-900 line-clamp-2">
-                   <%= product.productName %>
-                    </h3>
-                    <div class="flex items-center text-yellow-400 text-sm">
-                      <i class="fas fa-star"></i>
-                      <span class="ml-1 text-gray-600"><%= product.rating || 'No rating' %></span>
+                  <% if (product.discountPrice < product.originalPrice) { %>
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-xs font-medium">
+                      -<%= Math.round((product.originalPrice - product.discountPrice) / product.originalPrice * 100) %>%
                     </div>
-                    <div class="flex items-baseline gap-2">
-                      <span class="text-lg font-bold text-gray-900">₹<%= product.price %></span>
-                      
+                  <% } %>
+                </div>
+
+                <!-- Product Info -->
+                <div class="p-5">
+                  <!-- Brand & Rating -->
+                  <div class="flex justify-between items-center mb-2">
+                    <div class="text-sm text-gray-500 font-medium"><%= product.brand %></div>
+                    <div class="flex items-center gap-1">
+                      <i class="fas fa-star text-yellow-400 text-xs"></i>
+                      <span class="text-sm text-gray-500"><%= product.rating %></span>
                     </div>
                   </div>
-                </a>
+                  
+                  <!-- Product Name -->
+                  <h3 class="text-gray-900 font-medium mb-2 truncate group-hover:text-gray-700 transition-colors">
+                    <%= product.productName %>
+                  </h3>
+                  
+                  <!-- Price -->
+                  <div class="space-y-2">
+                    <% if (product.discountPrice < product.originalPrice) { %>
+                      <div class="flex items-baseline gap-3">
+                        <span class="text-4xl font-bold text-gray-900">₹<%= product.discountPrice %></span>
+                        <span class="text-xl text-gray-400 line-through">₹<%= product.originalPrice %></span>
+                        <span class="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+                          -<%= Math.round((product.originalPrice - product.discountPrice) / product.originalPrice * 100) %>%
+                        </span>
+                      </div>
+                    <% } else { %>
+                      <span class="text-4xl font-bold text-gray-900">₹<%= product.originalPrice %></span>
+                    <% } %>
+                  </div>
+                </div>
               </div>
-            <% }) %>
-          </div>
+            </a>
+          <% }) %>
         </div>
       </div>
     </div>

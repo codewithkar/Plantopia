@@ -228,12 +228,29 @@ async function toggleWishlist(productId) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-      // Get the wishlist button
       const wishlistBtn = document.querySelector(`#wishlist-btn-${productId} i`);
-      if (!wishlistBtn) return; // Exit if button doesn't exist
+      if (!wishlistBtn) return;
 
       const response = await fetch(`/wishlist/check/${productId}`);
-      const data = await response.json();
+      
+      // Add these debug lines
+      console.log('Response status:', response.status);
+      const responseText = await response.text(); // Get response as text first
+      console.log('Raw response:', responseText);
+      
+      // Try parsing if it looks like JSON
+      let data;
+      try {
+          data = JSON.parse(responseText);
+      } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          return;
+      }
+
+      if (response.status === 401) {
+          console.log('User not authenticated');
+          return;
+      }
 
       if (response.ok) {
           if (data.success && data.isInWishlist) {
@@ -244,8 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.log('Failed to check wishlist status:', data.message);
       }
   } catch (error) {
-      console.error('Error checking wishlist status:', error);
+      console.log('Error checking wishlist status:', error);
   }
 });
-
 

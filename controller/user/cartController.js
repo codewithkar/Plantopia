@@ -1,32 +1,66 @@
 import productSchema from '../../models/product.js';
 import cartSchema from '../../models/cart.js';
+import Offer from '../../models/offers.js'
+import { calculateFinalPrice } from '../../utils/offerCalculator.js';
+import Category from '../../models/category.js'
 
 const getCart = async (req, res) => {
     try {
         const userId = req.session.user;
+        const activeCategories = await Category.find({ isActive: true }).distinct('_id');
+
         const cart = await cartSchema.findOne({ userId }).populate({
             path: 'items.productId',
             populate: {
                 path: 'categoriesId'
             }
         });
-        
+
         if (!cart) {
-            return res.render('user/cart', { 
+            return res.render('user/cart', {
                 cartItems: [],
                 total: 0
             });
         }
+        // Filter out items with inactive categories or products
+        const validItems = cart.items.filter(item =>
+            item.productId &&
+            item.productId.categoriesId &&
+            item.productId.isActive &&
+            activeCategories.some(catId => catId.equals(item.productId.categoriesId._id))
+        );
 
-        // Recalculate prices with current offers
-        const updatedItems = await Promise.all(cart.items.map(async item => {
+        // Update cart if invalid items were removed
+        if (validItems.length !== cart.items.length) {
+            cart.items = validItems;
+            await cart.save();
+        }
+
+        // Process remaining items with current offers
+        const updatedItems = await Promise.all(validItems.map(async item => {
             const product = item.productId;
-            
+
             // Get active offers
-            const discountAmount = product.price * 0.20; // 20% discount
-            const currentPrice = product.price - discountAmount;
+            const offers = await Offer.find({
+                status: 'active',
+                startDate: { $lte: new Date() },
+                endDate: { $gte: new Date() },
+                $or: [
+                    { productIds: product._id },
+                    { categoryId: product.categoriesId._id }
+                ]
+            });
+
+            const productOffer = offers.find(offer =>
+                offer.productIds && offer.productIds.some(id => id.equals(product._id))
+            );
+
+            const categoryOffer = offers.find(offer =>
+                offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+            );
+
             // Calculate current price
-            
+            const currentPrice = calculateFinalPrice(product, categoryOffer, productOffer);
             const quantity = parseInt(item.quantity) || 1;
             const subtotal = currentPrice * quantity;
 
@@ -48,7 +82,7 @@ const getCart = async (req, res) => {
             };
         }));
 
-        // Calculate total ensuring numbers
+        // Calculate total
         const total = updatedItems.reduce((sum, item) => {
             return sum + (parseFloat(item.subtotal) || 0);
         }, 0);
@@ -62,13 +96,13 @@ const getCart = async (req, res) => {
         cart.total = total;
         await cart.save();
 
-        res.render('user/cart', { 
+        res.render('user/cart', {
             cartItems: updatedItems,
             total: total
         });
     } catch (error) {
         console.error('Error fetching cart:', error);
-        res.status(500).render('user/cart', { 
+        res.status(500).render('user/cart', {
             cartItems: [],
             total: 0,
             error: 'Failed to load cart'
@@ -79,11 +113,11 @@ const getCart = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
         console.log('here');
-        
+
         const { productId, quantity } = req.body;
         const userId = req.session.user;
-        
-             // Check if product exists and is in stock
+
+        // Check if product exists and is in stock
         const product = await productSchema.findById(productId).populate('categoriesId');
         if (!product || !product.isActive) {
             return res.status(400).json({
@@ -113,24 +147,24 @@ const addToCart = async (req, res) => {
             });
         } else {
             // Check if product already exists in cart
-            const existingItem = cart.items.find(item => 
+            const existingItem = cart.items.find(item =>
                 item.productId.toString() === productId
             );
 
             if (existingItem) {
                 // Calculate new quantity
                 const newQuantity = existingItem.quantity + parseInt(quantity);
-                
+
                 // Check if new quantity exceeds limit
                 if (newQuantity > 3) {
-                    return res.status(400).json({ 
+                    return res.status(400).json({
                         message: `Cannot add more items. Maximum limit is 3 (Current quantity: ${existingItem.quantity})`
                     });
                 }
 
                 // Check if new quantity exceeds stock
                 if (newQuantity > product.stock) {
-                    return res.status(400).json({ 
+                    return res.status(400).json({
                         message: 'Not enough stock available'
                     });
                 }
@@ -155,14 +189,14 @@ const addToCart = async (req, res) => {
 
         await cart.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Product added to cart successfully',
             cartCount: cart.items.length,
             total: cart.total
         });
 
-       
-       
+
+
     } catch (error) {
         console.error('Error adding to cart:', error);
         res.status(500).json({ message: 'Failed to add product to cart' });
@@ -215,7 +249,7 @@ const updateQuantity = async (req, res) => {
 
         const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Quantity updated successfully',
             quantity: quantity,
             subtotal: quantity * cartItem.price,
@@ -240,7 +274,7 @@ const removeFromCart = async (req, res) => {
         }
 
         // Remove the item
-        cart.items = cart.items.filter(item => 
+        cart.items = cart.items.filter(item =>
             item.productId.toString() !== productId
         );
 
@@ -257,7 +291,7 @@ const removeFromCart = async (req, res) => {
 
         const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Item removed from cart',
             total,
             itemCount: cart.items.length
@@ -268,7 +302,7 @@ const removeFromCart = async (req, res) => {
         res.status(500).json({ message: 'Failed to remove item from cart' });
     }
 };
-export default { 
+export default {
     getCart,
     addToCart,
     updateQuantity,

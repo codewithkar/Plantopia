@@ -24,6 +24,43 @@
             </div>
 
             <!-- Offers List -->
+            <div class="grid gap-4">
+                <% offers.forEach(offer => { %>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold"><%= offer.name %></h3>
+                                <p class="text-gray-600">
+                                    <% if (offer.categoryId) { %>
+                                        Category: <%= offer.categoryId.name %>
+                                    <% } else { %>
+                                        Products: 
+                                        <% offer.productIds.forEach((product, index) => { %>
+                                            <%= product.productName %><%= index < offer.productIds.length - 1 ? ', ' : '' %>
+                                        <% }) %>
+                                    <% } %>
+                                </p>
+                                <p class="text-gray-600">Discount: <%= offer.discount %>%</p>
+                                <p class="text-gray-600">
+                                    Valid: <%= new Date(offer.startDate).toLocaleDateString() %> - 
+                                    <%= new Date(offer.endDate).toLocaleDateString() %>
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="editOffer(this)" 
+                                        data-offer="<%- encodeURIComponent(JSON.stringify(offer)) %>"
+                                        class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteOffer('<%= offer._id %>')"
+                                        class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
         </div>
     </div>
 
@@ -156,8 +193,8 @@
 
     <script>
         let isSubmitting = false;
-        // const products = <%- JSON.stringify(products) %>;
-        // const categories = <%- JSON.stringify(categories) %>;
+        const products = <%- JSON.stringify(products) %>;
+        const categories = <%- JSON.stringify(categories) %>;
 
         function handleTypeChange() {
             const type = document.getElementById('offerType').value;

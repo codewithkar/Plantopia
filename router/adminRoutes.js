@@ -7,7 +7,7 @@ import categoryController from '../controller/admin/categoryController.js';
 import orderController from '../controller/admin/orderController.js';
 import offerController from '../controller/admin/offerController.js';
 import couponController from '../controller/admin/couponController.js';
-import salesReportController from '../controller/admin/salesReportController.js';
+import reportController from '../controller/admin/reportController.js';
 
 const router = express.Router();
 
@@ -44,11 +44,30 @@ router.delete('/category/delete/?id', adminMiddleware.checkSession, categoryCont
 // order Routes
 router.get('/orders',adminMiddleware.checkSession,orderController.getOrderList)
 router.post('/orders/:orderId/status', adminMiddleware.checkSession, orderController.updateOrderStatus);
+router.post('/orders/:orderId/items/:productId/status', adminMiddleware.checkSession, orderController.updateItemStatus);
+router.post('/orders/:orderId/items/:productId/return', adminMiddleware.checkSession, orderController.handleReturnRequest);
 
 
-router.get('/offers',adminMiddleware.checkSession,offerController.getOfferList)
-router.get('/coupon',adminMiddleware.checkSession,couponController.getCouponList)
-router.get('/sales-report',adminMiddleware.checkSession,salesReportController.getReport)
+// Coupon Routes
+router.get('/coupon', adminMiddleware.checkSession, couponController.getCouponList);
+router.post('/coupons/add', adminMiddleware.checkSession, couponController.addCoupon);
+router.get('/coupons/:id', adminMiddleware.checkSession, couponController.getCouponDetails);
+router.post('/coupons/edit/:id', adminMiddleware.checkSession, couponController.updateCoupon);
+router.post('/coupons/delete/:id', adminMiddleware.checkSession, couponController.deleteCoupon);
+router.post('/coupons/toggle-status/:id', adminMiddleware.checkSession, couponController.toggleCouponStatus);
+
+
+router.get('/offers', adminMiddleware.checkSession, offerController.getOffers);
+router.post('/offers', adminMiddleware.checkSession, offerController.createOffer);
+router.get('/offers/:offerId', adminMiddleware.checkSession, offerController.getOffer);
+router.put('/offers/:offerId', adminMiddleware.checkSession, offerController.updateOffer);
+router.delete('/offers/:offerId', adminMiddleware.checkSession, offerController.deleteOffer);
+
+router.get('/sales-report', adminMiddleware.checkSession, reportController.getSalesReport);
+
+router.get('/sales-report/download-excel', adminMiddleware.checkSession, reportController.downloadExcel);
+
+router.get('/sales-report/download-pdf', adminMiddleware.checkSession, reportController.downloadPDF); 
 router.get('/logout', adminMiddleware.checkSession, adminController.getLogout);
 
 export default router;

@@ -1,5 +1,6 @@
 import Product from '../../models/product.js';
-
+import Offer from '../../models/offers.js'
+import { calculateFinalPrice } from '../../utils/offerCalculator.js';
 
 
 const getProductDetails = async (req, res) => {
@@ -11,20 +12,36 @@ const getProductDetails = async (req, res) => {
         if (!product) {
             res.status(404).render('user/productNotFound');
         }
-        // Calculate final price with demo discount
-        const discountAmount = product.price * 0.20; // 20% discount
-        const finalPrice = product.price - discountAmount;
-        // Demo offer data
-    
+
+        // Fetch active offers for this product and its category
+        const offers = await Offer.find({
+            status: 'active',
+            startDate: { $lte: new Date() },
+            endDate: { $gte: new Date() },
+            $or: [
+                { productIds: product._id },
+                { categoryId: product.categoriesId._id }
+            ]
+        });
+
+        const productOffer = offers.find(offer => 
+            offer.productIds && offer.productIds.some(id => id.equals(product._id))
+        );
+        
+        const categoryOffer = offers.find(offer => 
+            offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+        );
 
         // Calculate final price with offers
-        // const finalPrice = calculateFinalPrice(product, categoryOffer, productOffer);
+        const finalPrice = calculateFinalPrice(product, categoryOffer, productOffer);
         
         const processedProduct = {
             ...product.toObject(),
             discountPrice: finalPrice,
             originalPrice: product.price,
             offerApplied: finalPrice < product.price,
+            offerPercentage: productOffer?.discount || categoryOffer?.discount || 0,
+            appliedOffer: productOffer || categoryOffer
 
         };
 
@@ -34,23 +51,23 @@ const getProductDetails = async (req, res) => {
             isActive: true,
             _id: { $ne: productId }
         })
-        .limit(5);
+        .limit(4);
 
         const processedRelatedProducts = relatedProducts.map(relProduct => {
-           
+            const relProductOffer = offers.find(offer => 
+                offer.productIds && offer.productIds.some(id => id.equals(relProduct._id))
+            );
             
-            const discountAmount = product.price * 0.20; // 20% discount
-            const finalPrice = product.price - discountAmount;
+            const finalPrice = calculateFinalPrice(relProduct, categoryOffer, relProductOffer);
             
             return {
                 ...relProduct.toObject(),
-                discountAmount: finalPrice,
+                discountPrice: finalPrice,
                 originalPrice: relProduct.price,
                 offerApplied: finalPrice < relProduct.price,
-                
+                offerPercentage: relProductOffer?.discount || categoryOffer?.discount || 0
             };
         });
-
         res.render('user/viewProduct', { 
             product: processedProduct,
             relatedProducts: processedRelatedProducts,
