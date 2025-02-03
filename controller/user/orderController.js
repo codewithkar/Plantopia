@@ -1,7 +1,7 @@
 import orderSchema from '../../models/order.js';
 import userSchema from '../../models/users.js';
 import productSchema from '../../models/product.js';
-import wallet from '../../models/wallet.js';
+import Wallet from '../../models/wallet.js';
 
 const getOrders = async (req, res) => {
     try {

@@ -156,70 +156,6 @@ const postSignUp = async (req, res) => {
     }
 }
 
-const postOtp = async (req, res) => {
-    try {
-        const { userOtp, email } = req.body;
-        const user = await userSchema.findOne({ email, otp: userOtp });
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'Invalid OTP' });
-        }
-
-        if (Date.now() > user.otpExpiresAt) {
-            user.otpAttempts += 1;
-            if (user.otpAttempts >= 3) {
-                await userSchema.deleteOne({ _id: user._id });
-                return res.status(400).json({ error: 'Too many attempts. Please signup again.' });
-            }
-            await user.save();
-            return res.status(400).json({ error: 'OTP expired' });
-        }
-
-        // Increment attempts before validating to prevent brute force
-      
-        await user.save();
-
-        // If OTP matches, verify user
-        if (user.otp === userOtp) {
-            await userSchema.findByIdAndUpdate(user._id, {
-                $set: { isVerified: true },
-                $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
-            });
-
-            req.session.user = user._id;
-            return res.json({ 
-                success: true, 
-                message: 'OTP verified successfully',
-                redirectUrl: '/home'
-            });
-        } else {
-            return res.status(400).json({ error: 'Invalid OTP' });
-        }
-
-    } catch (error) {
-        console.error('OTP verification error:', error);
-        return res.status(500).json({ error: 'OTP verification failed' });
-    }
-}
-
-
-const postResendOtp = async (req, res) => {
-    try {
-        const user = await userSchema.findOne({ isVerified: false });
-        if (!user) return res.status(400).json({ error: 'User not found' });
-
-        const otp = sendOTP.generateOTP();
-        user.otp = otp;
-        user.otpExpiresAt = Date.now() + 120 * 1000;
-        user.otpAttempts = 0;
-        await user.save();
-
-        await sendOTP.sendOTPEmail(user.email, otp);
-        res.status(200).json({ message: 'OTP resent' });
-    } catch (error) {
-        res.status(500).json({ error: 'Resend failed' });
-    }
-}
 
 const getLogout = (req, res) => {
     req.session.user = null;
@@ -290,13 +226,186 @@ const getGoogleCallback = (req, res) => {
 };
 
 
+// Unified function for sending/resending OTP
+// const handleOTP = async (req, res) => {
+//     try {
+//         const { email, isResend } = req.body;
+        
+//         // For resend, find existing unverified user
+//         if (isResend) {
+//             const existingUser = await userSchema.findOne({ email, isVerified: false });
+//             if (!existingUser) {
+//                 return res.json({
+//                     success: false,
+//                     message: 'No pending verification found for this email'
+//                 });
+//             }
+
+//             const otp = sendOTP.generateOTP();
+//             existingUser.otp = otp;
+//             existingUser.otpExpiresAt = Date.now() + 120000; // 2 minutes
+//             existingUser.otpAttempts = 0;
+//             await existingUser.save();
+//             await sendOTP.sendOTPEmail(email, otp);
+
+//             return res.json({
+//                 success: true,
+//                 message: 'OTP has been resent successfully'
+//             });
+//         }
+        
+//         // For initial signup
+//         const { firstName, lastName, password } = req.body;
+        
+//         if (!isResend && (!firstName || !lastName || !password)) {
+//             return res.json({
+//                 success: false,
+//                 message: 'All fields are required'
+//             });
+//         }
+
+//         // Check for existing verified user
+//         const existingVerifiedUser = await userSchema.findOne({ email, isVerified: true });
+//         if (existingVerifiedUser) {
+//             return res.json({
+//                 success: false,
+//                 message: 'User already exists'
+//             });
+//         }
+
+//         // Delete any existing unverified user
+//         const existingUnverifiedUser = await userSchema.findOne({ email, isVerified: false });
+//         if (existingUnverifiedUser) {
+//             await userSchema.deleteOne({ _id: existingUnverifiedUser._id });
+//         }
+
+//         // Create new user for signup
+//         const otp = sendOTP.generateOTP();
+//         const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+//         const newUser = new userSchema({
+//             firstName: firstName?.trim(),
+//             lastName: lastName?.trim(),
+//             email,
+//             password: hashedPassword,
+//             otp,
+//             otpExpiresAt: Date.now() + 120000,
+//             otpAttempts: 0
+//         });
+
+//         await newUser.save();
+
+//         // Schedule deletion after OTP expiry
+//         setTimeout(async () => {
+//             const user = await userSchema.findOne({ email });
+//             if (user && !user.isVerified) {
+//                 await userSchema.deleteOne({ _id: user._id });
+//             }
+//         }, 180000); // 3 minutes
+
+//         await sendOTP.sendOTPEmail(email, otp);
+
+//         return res.json({
+//             success: true,
+//             message: 'OTP sent successfully',
+//             email: email
+//         });
+
+//     } catch (error) {
+//         console.error('OTP handling error:', error);
+//         return res.json({
+//             success: false,
+//             message: 'Failed to process OTP request'
+//         });
+//     }
+// };
+
+
+const postOtp = async (req, res) => {
+    try {
+        const { userOtp, email } = req.body;
+        const user = await userSchema.findOne({ email, otp: userOtp });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
+        }
+
+        if (Date.now() > user.otpExpiresAt) {
+            user.otpAttempts += 1;
+            if (user.otpAttempts >= 3) {
+                await userSchema.deleteOne({ _id: user._id });
+                return res.status(400).json({ error: 'Too many attempts. Please signup again.' });
+            }
+            await user.save();
+            return res.status(400).json({ error: 'OTP expired' });
+        }
+
+        // Increment attempts before validating to prevent brute force
+      
+        await user.save();
+
+        // If OTP matches, verify user
+        if (user.otp === userOtp) {
+            await userSchema.findByIdAndUpdate(user._id, {
+                $set: { isVerified: true },
+                $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
+            });
+
+            req.session.user = user._id;
+            return res.json({ 
+                success: true, 
+                message: 'OTP verified successfully',
+                redirectUrl: '/home'
+            });
+        } else {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+
+    } catch (error) {
+        console.error('OTP verification error:', error);
+        return res.status(500).json({ error: 'OTP verification failed' });
+    }
+}
+
+
+const postResendOtp = async (req, res) => {
+    try {
+        const { email } = req.body; // Get email from request body
+        
+        const user = await userSchema.findOne({ email, isVerified: false });
+        if (!user) {
+            return res.json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+
+        const otp = sendOTP.generateOTP();
+        user.otp = otp;
+        user.otpExpiresAt = Date.now() + 120 * 1000; // 2 minutes
+        user.otpAttempts = 0;
+        await user.save();
+
+        await sendOTP.sendOTPEmail(user.email, otp);
+        
+        return res.json({ 
+            success: true, 
+            message: 'OTP has been resent successfully' 
+        });
+    } catch (error) {
+        return res.json({ 
+            success: false, 
+            message: 'Failed to resend OTP' 
+        });
+    }
+}
 export default { 
     getLogin, 
     getSignin, 
     getLogout,  
     postSignUp, 
-    postOtp, 
-    postResendOtp, 
+    postOtp,
+    postResendOtp,
     postLogin, 
     getGoogle,
     getGoogleCallback }; 

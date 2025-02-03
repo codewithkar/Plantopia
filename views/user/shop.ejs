@@ -123,9 +123,23 @@
 
           <!-- Right Side - Product Grid -->
           <div class="md:w-3/4">
-            <!-- Search Bar -->
+            <div class="pb-4">
+              <!-- Search Bar -->
+            <form id="searchForm" class="relative">
+              <input 
+                  type="search" 
+                  name="q"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  placeholder="Search products..."
+                  value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+              >
+              <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <i class="fas fa-search text-gray-400"></i>
+              </button>
+          </form>
+            </div>
            
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6" id="productGrid">
+            <div class="grid grid-cols-1 sm:g  rid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6" id="productGrid">
               <% products.forEach(function(product) {%>
                 
                 <a href="/product/<%= product._id %>">
@@ -164,6 +178,7 @@
               <% }); %>
              
             </div>
+            <div id="pagination" class="mt-8"></div>
           </div>
         </div>
       </div>

@@ -28,7 +28,11 @@ router.get('/auth/google/callback', userverification.getGoogleCallback);
 
 //signup
 router.get('/signup', userMiddleware.isLogin,userverification.getSignin);
+router.get('/otp-verification',userMiddleware.isLogin, (req, res) => {
+    res.render('user/signupOtp');
+});
 router.post('/signup', userverification.postSignUp);
+// router.post('/handle-otp', userverification.handleOTP);
 router.post('/validate-otp', userverification.postOtp);
 router.post('/resend-otp',userverification.postResendOtp);
 router.get('/auth/google',  userverification.getGoogle);
@@ -46,8 +50,8 @@ router.get('/home', userHomeController.getHome);
 
 //Shop
 router.get('/shop', shopController.getShop);
-router.get('/shop/filtered', shopController.getFilteredProducts);
-router.get('/shop/search', shopController.searchProducts);
+// router.get('/shop/filtered', shopController.getFilteredProducts);
+// router.get('/shop/search', shopController.searchProducts);
 
 
 //Product
