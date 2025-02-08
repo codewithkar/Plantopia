@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
       resetButton: document.getElementById('resetButton'),
       productGrid: document.getElementById('productGrid'),
       searchForm: document.getElementById('searchForm'),
+      searchInput: document.querySelector('input[name="q"]'),
       paginationContainer: document.getElementById('pagination')
   };
 
@@ -141,6 +142,22 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
   }
 
+  if (elements.searchInput) {
+    // Handle the search input clearing (both manual clearing and clicking the "x" button)
+    elements.searchInput.addEventListener('input', (event) => {
+        if (elements.searchInput.value === '') {
+            currentPage = 1;
+            fetchProducts(currentPage);
+        }
+    });
+
+    elements.searchInput.addEventListener('search', (event) => {
+        if (elements.searchInput.value === '') {
+            currentPage = 1;
+            fetchProducts(currentPage);
+        }
+    });
+
   // Event listeners
   if (elements.searchForm) {
       elements.searchForm.addEventListener('submit', function(e) {
@@ -167,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 500);
       });
   });
-
+  }
   // Reset filters
   elements.resetButton.addEventListener('click', () => {
       elements.sortFilter.value = 'default';
@@ -176,6 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.minPriceInput.value = '';
       elements.maxPriceInput.value = '';
       elements.stockFilter.value = 'All';
+      if (elements.searchInput) {
+        elements.searchInput.value = ''; // Clear search input
+    }
       currentPage = 1;
       fetchProducts(currentPage);
   });
