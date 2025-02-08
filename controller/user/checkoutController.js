@@ -898,6 +898,9 @@ const verifyPayment = async (req, res) => {
         });
     }
 };
+
+
+
 export default { 
         loadCheckoutPage,
         placeOrder,
@@ -907,5 +910,5 @@ export default {
         walletPayment,
         handlePaymentFailure,
         createRazorpayOrder,
-        verifyPayment
+        verifyPayment,
     };
