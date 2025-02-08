@@ -8,14 +8,15 @@ import orderController from '../controller/admin/orderController.js';
 import offerController from '../controller/admin/offerController.js';
 import couponController from '../controller/admin/couponController.js';
 import reportController from '../controller/admin/reportController.js';
+import dashBoardController from '../controller/admin/dashBoardController.js';
 
 const router = express.Router();
 
 
 router.get('/login',adminMiddleware.isLogin, adminController.getAdmin);
 router.post('/login',adminController.postAdmin);
-router.get('/dashboard', adminMiddleware.checkSession, adminController.getDashboard);
-
+router.get('/dashboard', adminMiddleware.checkSession, dashBoardController.getDashboard);
+router.get('/dashboard/data', adminMiddleware.checkSession, dashBoardController.getDashboardData);
 
 // Product Routes
 router.get('/products',adminMiddleware.checkSession,productController.getProductPage)

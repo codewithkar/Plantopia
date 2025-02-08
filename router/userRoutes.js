@@ -60,6 +60,8 @@ router.get('/product/:id', productController.getProductDetails);
 //Profile
 router.get('/profile', userMiddleware.checkSession,profileController.getProfile);
 router.post('/profile/update', userMiddleware.checkSession, profileController.updateProfile);
+router.get('/change-password', userMiddleware.checkSession,profileController.getChangePassword);
+router.post('/change-password', userMiddleware.checkSession, profileController.postChangePassword)
 
 //Address
 router.get('/address', userMiddleware.checkSession,addressController.getAddress);
@@ -78,18 +80,21 @@ router.get('/checkout', userMiddleware.checkSession,checkoutController.loadCheck
 router.post('/checkout/place-order', userMiddleware.checkSession, checkoutController.placeOrder);
 router.post('/checkout/create-razorpay-order', userMiddleware.checkSession, checkoutController.createRazorpayOrder);
 router.post('/checkout/verify-payment', userMiddleware.checkSession, checkoutController.verifyPayment);
-
-
 router.post('/checkout/apply-coupon', userMiddleware.checkSession, checkoutController.applyCoupon);
-
 router.post('/checkout/remove-coupon', userMiddleware.checkSession, checkoutController.removeCoupon);
-
 router.get('/checkout/available-coupons', userMiddleware.checkSession, checkoutController.getAvailableCoupons);
+router.post('/checkout/payment-failed', userMiddleware.checkSession, checkoutController.handlePaymentFailure);
+router.post('/checkout/wallet-payment', userMiddleware.checkSession, checkoutController.walletPayment);
+
+
+
 
 //Orders
 router.get('/orders', userMiddleware.checkSession, orderController.getOrders);
 router.post('/orders/:orderId/cancel/:productId', userMiddleware.checkSession, orderController.cancelOrder);
 router.post('/orders/:orderId/items/:productId/return', userMiddleware.checkSession, orderController.requestReturnItem);
+router.post('/orders/:orderId/retry-payment', userMiddleware.checkSession, orderController.retryPayment);
+router.post('/orders/:orderId/verify-retry-payment', userMiddleware.checkSession, orderController.verifyRetryPayment);
 
 
 

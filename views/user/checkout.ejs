@@ -546,8 +546,6 @@
               });
 
               const data = await response.json();
-              console.log(data);
-              
 
               if (data.success) {
 
@@ -595,7 +593,7 @@
                       walletAvailability.classList.add('bg-green-100', 'text-green-800');
                   }
                   
-                  if (newTotal <= 9000) {
+                  if (newTotal <= 1000) {
                       // Enable COD
                       codOption.classList.remove('opacity-60');
                       codOption.classList.add('hover:bg-gray-50');
@@ -616,12 +614,9 @@
                   // Show success message
                   await showAlert('success', 'Coupon applied successfully!');
               } else {
-                console.log('else');
-                await showAlert('error', data.message);
-                  // throw new Error(data.message || 'Failed to apply coupon');
-              } 
+                  throw new Error(data.message || 'Failed to apply coupon');
+              }
           } catch (error) {
-            console.log(error);
               console.error('Error in applyCoupon:', error);
           }
       }
@@ -803,8 +798,8 @@
               const finalAmount = parseFloat(document.getElementById('finalTotal').textContent);
 
               // Validate COD payment method
-              if (paymentMethod === 'cod' && finalAmount > 9000) {
-                  await showAlert('error', 'Cash on Delivery is not available for orders above ₹9,000. Please choose a different payment method.');
+              if (paymentMethod === 'cod' && finalAmount > 1000) {
+                  await showAlert('error', 'Cash on Delivery is not available for orders above ₹1,000. Please choose a different payment method.');
                   return;
               }
 
@@ -848,11 +843,12 @@
                       key: data.key,
                       amount: data.order.amount,
                       currency: "INR",
-                      name: "PLANTOPIA",
+                      name: "Plantopia",
                       description: "Order Payment",
                       order_id: data.order.id,
                       handler: async function (response) {
                           try {
+                            await showAlert('loading', 'Verifying payment...');
                               const verifyResponse = await fetch('/checkout/verify-payment', {
                                   method: 'POST',
                                   headers: {
@@ -867,16 +863,24 @@
 
                               const verifyData = await verifyResponse.json();
                               if (verifyData.success) {
-                                  // Show success alert before redirecting
-                                  await showAlert('success', 'Order Placed Successfully!', `Order ID: ${verifyData.orderId}`);
+                                hideAlert(); // Hide loading alert
+
+                                // Show success alert before redirecting
+                                await showAlert('success', 'Payment Successful!', `Order ID: ${verifyData.orderId}`);
 
                                   // Redirect to orders page
                                   window.location.href = `/orders?success=true&orderId=${verifyData.orderId}`;
-                              } else {
-                                  throw new Error(verifyData.message);
-                              }
+                                } else {
+                                  throw new Error(verifyData.message || 'Payment verification failed');
+                                }
                           } catch (error) {
-                              await showAlert('error', 'Payment Failed', error.message);
+                            hideAlert(); // Hide loading alert
+
+                            await handlePaymentFailure({
+                              error: error,
+                              orderId: data.order.id,
+                              message: 'Payment verification failed'
+                            });                         
                           }
                       },
                       prefill: {
@@ -894,7 +898,7 @@
                                       method: 'POST',
                                       headers: {
                                           'Content-Type': 'application/json'
-                                      },
+                                      },  
                                       body: JSON.stringify({
                                           error: { description: 'Payment cancelled by user' },
                                           razorpay_order_id: options.order_id
@@ -963,14 +967,14 @@
           const codAvailability = document.getElementById('codAvailability');
           const codMessage = document.getElementById('codMessage');
 
-          if (finalAmount > 9000) {
+          if (finalAmount > 1000) {
               codOption.classList.add('opacity-60');
               codOption.classList.remove('hover:bg-gray-50');
               codPayment.disabled = true;
               codAvailability.classList.remove('hidden');
               codAvailability.classList.add('bg-red-100', 'text-red-800');
               codAvailability.textContent = 'Not Available';
-              codMessage.textContent = 'Not available for orders above ₹9,000';
+              codMessage.textContent = 'Not available for orders above ₹1,000';
 
               // If COD was selected, switch to a different payment method
               if (codPayment.checked) {

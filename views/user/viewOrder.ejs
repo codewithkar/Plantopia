@@ -319,69 +319,6 @@
             }
         }
 
-        // async function requestReturnForItem(orderId, productId, productName) {
-        //     const reasons = {
-        //         'Product damaged': 'Product damaged',
-        //         'Wrong product received': 'Wrong product received',
-        //         'Product not as described': 'Product not as described',
-        //         'Size/fit issue': 'Size/fit issue',
-        //         'Quality not as expected': 'Quality not as expected',
-        //         'Other': 'Other'
-        //     };
-
-        //     // Show confirm dialog with select input
-        //     const select = document.createElement('select');
-        //     select.className = 'mt-4 w-full rounded border-gray-300';
-        //     select.innerHTML = `
-        //         <option value="">Select a reason</option>
-        //         ${Object.entries(reasons).map(([key, value]) => 
-        //             `<option value="${key}">${value}</option>`
-        //         ).join('')}
-        //     `;
-
-        //     const confirmMessage = document.getElementById('confirmMessage');
-        //     confirmMessage.textContent = 'Please select a reason for return';
-        //     confirmMessage.appendChild(select);
-
-        //     showAlert('confirm', '', `Return ${productName}`);
-
-        //     document.getElementById('confirmAction').onclick = async () => {
-        //         const reason = select.value;
-        //         if (!reason) {
-        //             showAlert('error', 'Please select a reason');
-        //             return;
-        //         }
-
-        //         try {
-        //             hideAlert();
-        //             showAlert('loading');
-
-        //             const response = await fetch(`/orders/${orderId}/items/${productId}/return`, {
-        //                 method: 'POST',
-        //                 headers: { 'Content-Type': 'application/json' },
-        //                 body: JSON.stringify({ reason })
-        //             });
-
-        //             const data = await response.json();
-        //             hideAlert();
-
-        //             if (response.ok) {
-        //                 showAlert('success', data.message || 'Return request submitted successfully');
-        //                 // Add reload after success alert is closed
-        //                 document.querySelector('#successAlert button').onclick = () => {
-        //                     hideAlert();
-        //                     window.location.reload();
-        //                 };
-        //             } else {
-        //                 throw new Error(data.message || 'Failed to submit return request');
-        //             }
-        //         } catch (error) {
-        //             hideAlert();
-        //             showAlert('error', error.message || 'Failed to request return');
-        //         }
-        //     };
-        // }
-
         async function requestReturnForItem(orderId, productId, productName) {
     const { value: reason } = await Swal.fire({
         title: `Return ${productName}`,
@@ -492,7 +429,7 @@
                         amount: data.order.amount,
                         currency: data.order.currency,
                         order_id: data.order.id,
-                        name: "Onyx Fashion Store",
+                        name: "Plantopia",
                         description: "Order Payment Retry",
                         handler: async function (response) {
                             try {
