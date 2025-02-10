@@ -19,6 +19,8 @@ import sendOtp from '../utils/sendOTP.js'
 
 const router = express.Router();
 
+// router.use(userMiddleware.checkBlockedStatus);
+
 router.get('/login',userMiddleware.isLogin,userverification.getLogin);
 router.post('/login', userverification.postLogin);
 router.get('/auth/google', userverification.getGoogle);
@@ -95,7 +97,7 @@ router.post('/orders/:orderId/cancel/:productId', userMiddleware.checkSession, o
 router.post('/orders/:orderId/items/:productId/return', userMiddleware.checkSession, orderController.requestReturnItem);
 router.post('/orders/:orderId/retry-payment', userMiddleware.checkSession, orderController.retryPayment);
 router.post('/orders/:orderId/verify-retry-payment', userMiddleware.checkSession, orderController.verifyRetryPayment);
-
+router.get('/orders/:orderId/invoice', userMiddleware.checkSession, orderController.generateInvoice)
 
 
 router.get('/wishlist', userMiddleware.checkSession, wishListController.getWishlist);
@@ -114,8 +116,6 @@ router.post('/wallet/add-funds', userMiddleware.checkSession, walletController.a
 router.get('/wallet', userMiddleware.checkSession,walletController.getWallet);
 router.get('/coupons', userMiddleware.checkSession,couponController.getCoupon);
 router.get('/logout', userverification.getLogout);
-
-
 
 
 

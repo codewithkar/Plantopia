@@ -2229,6 +2229,10 @@ video {
   color: rgb(161 161 170 / var(--tw-text-opacity, 1));
 }
 
+.underline {
+  text-decoration-line: underline;
+}
+
 .line-through {
   text-decoration-line: line-through;
 }

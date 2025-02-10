@@ -138,7 +138,7 @@ const placeOrder = async (req, res) => {
         const finalAmount = cartTotal - couponDiscount;
 
         // Validate COD payment method
-        if (paymentMethod === 'cod' && finalAmount > 9000) {
+        if (paymentMethod === 'cod' && finalAmount > 1000) {
             return res.status(400).json({
                 success: false,
                 message: 'Cash on Delivery is not available for orders above ₹1,000. Please choose a different payment method.'
