@@ -39,6 +39,7 @@ const checkCartSession = async (req, res, next) => {
                 redirectUrl: '/login'
             });
         }
+        next()
         // Add block check for cart actions
         // await checkBlockedStatus(req, res, next);
     } catch (error) {
