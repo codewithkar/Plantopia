@@ -1,9 +1,5 @@
-// import User from '../model/userModel.js';
-// import { config } from 'dotenv';
 
 import { get } from "mongoose";
-
-// config()
 
 
 
@@ -12,7 +8,7 @@ const getAdmin = (req, res) => {
 }
 
 const postAdmin = async (req, res) => {
-   // console.log('Admin Email:', process.env.ADMIN_EMAIL); // Debug line
+   // console.log('Admin Email:', process.env.ADMIN_EMAIL); 
     const { email, password } = req.body;
     
     if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
@@ -23,7 +19,7 @@ const postAdmin = async (req, res) => {
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         req.session.isAdmin = true;
         res.redirect('/admin/dashboard');
-    } else {
+    } else { 
         res.render('admin/login');
     }
 }
@@ -34,7 +30,7 @@ const getDashboard = (req, res) => {
 
 const getLogout = (req, res) => {
     if (req.session.isAdmin) {
-        // Clear session properties without destroying the session
+  
         req.session.isAdmin = null;
         res.redirect('/admin/login');
     } else {

@@ -12,7 +12,7 @@ const getOrders = async (req, res) => {
 
         const userId = req.session.user;
         const page = parseInt(req.query.page) || 1;
-        const limit = 5; // Orders per page
+        const limit = 5; // Orders per page 
         
         // Get total orders count
         const totalOrders = await orderSchema.countDocuments({ userId });

@@ -686,7 +686,6 @@ const getDashboardData = async (req, res) => {
                     {
                         $project: {
                             productName: '$productDetails.productName',
-                            brand: '$productDetails.brand',
                             totalQuantity: 1,
                             totalRevenue: 1,
                             imageUrl: { $arrayElemAt: ['$productDetails.imageUrl', 0] }
