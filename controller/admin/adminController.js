@@ -1,8 +1,3 @@
-
-import { get } from "mongoose";
-
-
-
 const getAdmin = (req, res) => {
     res.render('admin/login');
 }
@@ -37,8 +32,6 @@ const getLogout = (req, res) => {
         res.redirect('/admin/login');
     }
 };
-
-
 
 
 export default { getAdmin,postAdmin,getDashboard,getLogout}; // Add  getUserList, getToggle to export

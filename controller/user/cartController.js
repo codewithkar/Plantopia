@@ -302,6 +302,7 @@ const removeFromCart = async (req, res) => {
         res.status(500).json({ message: 'Failed to remove item from cart' });
     }
 };
+
 export default {
     getCart,
     addToCart,
