@@ -112,7 +112,6 @@ const getCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        console.log('here');
 
         const { productId, quantity } = req.body;
         const userId = req.session.user;

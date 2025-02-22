@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-.mybg-green{
-    background-color:#1C4E43;
+.mybg-green {
+    background-color: #1C4E43;
+}
+
+.badge {
+    position: absolute;
+    top: -8px;
+    /* Move badge higher */
+    right: -6px;
+    /* Adjust horizontal position */
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

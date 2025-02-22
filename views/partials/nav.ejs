@@ -48,9 +48,15 @@
         <div class="flex items-center space-x-4 mt-4 lg:mt-0">
           <a href="/wishlist" class="text-gray-600 transition-colors duration-300 transform dark:text-gray-300 hover:text-[#204B42] dark:hover:text-[#204B42]">
             <i class="fa-regular fa-heart"></i>
+            <% if (wishlistCount > 0) { %>
+              <span class="badge"><%= wishlistCount %></span>
+            <% } %>
           </a>
           <a href="/cart" class="text-gray-600 transition-colors duration-300 transform dark:text-gray-300 hover:text-[#204B42] dark:hover:text-[#204B42]" >
             <i class="fa-solid fa-cart-shopping"></i>
+            <% if (cartCount > 0) { %>
+              <span class="badge"><%= cartCount %></span>
+            <% } %>
           </a>
           <a href="/profile" class="text-gray-600 transition-colors duration-300 transform dark:text-gray-300 hover:text-[#204B42] dark:hover:text-[#204B42]" >
             <i class="fa-regular fa-user"></i>
@@ -72,4 +78,36 @@
     openIcon.classList.toggle('hidden');
     closeIcon.classList.toggle('hidden');
   });
+
+  async function updateCartWishlistCount() {
+    try {
+        const response = await fetch('/cart-wishlist-count');
+        const data = await response.json();
+
+        // Update wishlist count
+        const wishlistBadge = document.getElementById('wishlist-count');
+        if (wishlistBadge) {
+            wishlistBadge.textContent = data.wishlistCount;
+            wishlistBadge.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
+        }
+
+        // Update cart count
+        const cartBadge = document.getElementById('cart-count');
+        if (cartBadge) {
+            cartBadge.textContent = data.cartCount;
+            cartBadge.style.display = data.cartCount > 0 ? 'flex' : 'none';
+        }
+    } catch (error) {
+        console.error('Error updating cart/wishlist count:', error);
+    }
+}
+
+// Auto-update every 5 seconds
+setInterval(updateCartWishlistCount, 5000);
+
+// Update immediately on page load
+updateCartWishlistCount();
+
+
+
 </script>

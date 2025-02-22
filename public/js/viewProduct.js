@@ -44,6 +44,7 @@ async function addToCart(productId) {
     }
     
     if (response.ok) {
+      updateCartWishlistCount();
       // Update the button to "Go to Cart"
       const addToCartBtn = document.querySelector(`button[onclick="addToCart('${productId}')"]`);
       addToCartBtn.innerHTML = `
@@ -133,6 +134,7 @@ async function addToCart(productId) {
     });
 
     if (response.ok) {
+      updateCartWishlistCount();
       Swal.fire({
         icon: 'success',
         title: 'Added to Wishlist',
@@ -177,6 +179,7 @@ async function toggleWishlist(productId) {
       if (!response.ok) {
           // If not authenticated, redirect to login
           if (response.status === 401) {
+            updateCartWishlistCount();
               window.location.href = '/login?returnTo=' + window.location.pathname;
               return;
           }

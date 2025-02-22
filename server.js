@@ -7,6 +7,7 @@ import connectDB from './connections/dbConfig.js';
 import dotenv from 'dotenv';
 import passport from "passport";
 import './utils/googleAuth.js';
+import cartWishlistCountMiddleware from './utils/cartWishlistCount.js';
 
 dotenv.config();
 connectDB();
@@ -21,6 +22,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(nocache());
 
 
@@ -33,6 +35,7 @@ app.use(session({
     cookie: { secure: false }
   }));
 
+app.use(cartWishlistCountMiddleware);
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -41,7 +44,9 @@ app.use(passport.session())
 app.use('/admin', adminRoutes);
 app.use('/', userRoutes);
 
-
+app.get('/cart-wishlist-count', (req, res) => {
+  res.json({ cartCount: res.locals.cartCount, wishlistCount: res.locals.wishlistCount });
+});
 
 
 //! listening server

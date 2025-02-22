@@ -629,6 +629,10 @@ video {
   left: 0.75rem;
 }
 
+.right-0 {
+  right: 0px;
+}
+
 .right-2 {
   right: 0.5rem;
 }
@@ -1796,6 +1800,11 @@ video {
   padding: 2rem;
 }
 
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
 .px-10 {
   padding-left: 2.5rem;
   padding-right: 2.5rem;
@@ -2366,8 +2375,26 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mybg-green{
-  background-color:#1C4E43;
+.mybg-green {
+  background-color: #1C4E43;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  /* Move badge higher */
+  right: -6px;
+  /* Adjust horizontal position */
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hover\:scale-105:hover {

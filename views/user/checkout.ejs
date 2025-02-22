@@ -848,7 +848,9 @@
                       order_id: data.order.id,
                       handler: async function (response) {
                           try {
-                            await showAlert('loading', 'Verifying payment...');
+                            console.log("Payment response from Razorpay:", response);
+                            showAlert('loading', 'Verifying payment...');
+                            console.log("🚀 Sending payment verification request...");
                               const verifyResponse = await fetch('/checkout/verify-payment', {
                                   method: 'POST',
                                   headers: {
@@ -862,17 +864,14 @@
                               });
 
                               const verifyData = await verifyResponse.json();
+                              console.log("Verify Payment Response:", verifyData); // Debugging
+
                               if (verifyData.success) {
-                                hideAlert(); // Hide loading alert
-
-                                // Show success alert before redirecting
-                                await showAlert('success', 'Payment Successful!', `Order ID: ${verifyData.orderId}`);
-
-                                  // Redirect to orders page
+                                  await showAlert('success', `Order Placed Successfully! Order ID: ${verifyData.orderId}`);
                                   window.location.href = `/orders?success=true&orderId=${verifyData.orderId}`;
-                                } else {
+                              } else {
                                   throw new Error(verifyData.message || 'Payment verification failed');
-                                }
+                              }
                           } catch (error) {
                             hideAlert(); // Hide loading alert
 
@@ -895,7 +894,7 @@
                           ondismiss: async function() {
                               try {
                                   await fetch('/checkout/payment-failed', {
-                                      method: 'POST',
+                                      method: 'POST', 
                                       headers: {
                                           'Content-Type': 'application/json'
                                       },  
