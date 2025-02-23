@@ -214,18 +214,18 @@ const handleReturnRequest = async (req, res) => {
             // Set status back to delivered when return is rejected
             item.order.status = 'delivered';
             item.order.statusHistory.push({
-                status: 'delivered',
+                status: 'return rejected',
                 date: new Date(),
                 comment: `Return rejected by admin: ${adminComment}`
             });
 
-            // Set payment status to completed
+            item.order.status = 'delivered';
             order.payment.paymentStatus = 'completed';
         }
 
         await order.save();
         res.json({ success: true, message: 'Return request handled successfully' });
-
+ 
     } catch (error) {
         console.error('Handle return request error:', error);
         res.status(500).json({

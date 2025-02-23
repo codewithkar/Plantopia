@@ -145,7 +145,6 @@
                           <button 
                             class="quantity-btn bg-gray-200 text-gray-600 w-8 h-8 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             onclick="updateQuantity(this, '<%= item.product._id %>', 'increase')"
-                            <%= item.quantity >= 3 ? 'disabled' : '' %>
                           >
                             <i class="fas fa-plus"></i>
                           </button>
@@ -293,7 +292,18 @@
         
         let newQuantity;
         if (action === 'increase') {
-            if (currentQuantity >= 3) return;
+            if (currentQuantity >= 3){
+              Swal.fire({
+                icon: 'warning',
+                title: 'Limit Reached',
+                text: 'You cannot add more than 3 items of this product.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return;
+            } 
             newQuantity = currentQuantity + 1;
         } else {
             if (currentQuantity <= 1) return;
@@ -374,16 +384,9 @@
             });
         } finally {
             // Re-enable buttons
-            buttons.forEach(btn => {
-                btn.disabled = false;
-                if (action === 'increase' && newQuantity >= 3) {
-                    cartItem.querySelector('.quantity-btn:last-child').disabled = true;
-                }
-                if (action === 'decrease' && newQuantity <= 1) {
-                    cartItem.querySelector('.quantity-btn:first-child').disabled = true;
-                }
-            });
-            isUpdating = false;
+            buttons.forEach(btn => btn.disabled = false);
+        isUpdating = false;
+
         }
       }
 

@@ -483,43 +483,62 @@
         }
 
         // Updated return handling function
-        async function handleReturn(orderId, productId, returnStatus) {
-            const title = `${returnStatus === 'approved' ? 'Approve' : 'Reject'} Return Request`;
-            const message = `Are you sure you want to ${returnStatus} this return request?`;
-            
-            showAlert('confirm', message, title);
-            
-            document.getElementById('confirmProceed').onclick = async () => {
-                try {
-                    hideAlert();
-                    showAlert('loading');
+        function handleReturn(orderId, productId, returnStatus) {
+    const returnModal = document.getElementById('returnModal');
+    const returnModalTitle = document.getElementById('returnModalTitle');
+    const returnModalComment = document.getElementById('returnModalComment');
+    const returnModalConfirm = document.getElementById('returnModalConfirm');
 
-                    const response = await fetch(`/admin/orders/${orderId}/items/${productId}/return`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            returnStatus,
-                            adminComment: document.getElementById('returnModalComment')?.value || `Return request ${returnStatus}`
-                        })
-                    });
+    // Set the modal title based on the action
+    returnModalTitle.textContent = returnStatus === 'approved' ? "Approve Return Request" : "Reject Return Request";
 
-                    const data = await response.json();
-                    
-                    hideAlert();
-                    if (response.ok) {
-                        updateUIReturn(orderId, productId, returnStatus);
-                        showAlert('success', 'Return request processed successfully');
-                    } else {
-                        throw new Error(data.message || 'Failed to process return request');
-                    }
-                } catch (error) {
-                    hideAlert();
-                    showAlert('error', error.message);
-                }
-            };
+    // Clear the comment box before opening the modal
+    returnModalComment.value = '';
 
-            document.getElementById('confirmCancel').onclick = hideAlert;
+    // Show the modal
+    returnModal.classList.remove('hidden');
+
+    // Handle confirm button click
+    returnModalConfirm.onclick = async () => {
+        const adminComment = returnModalComment.value.trim();
+
+        // Ensure a comment is provided if rejecting
+        if (returnStatus === 'rejected' && !adminComment) {
+            alert("Please provide a reason for rejection.");
+            return;
         }
+
+        try {
+            hideAlert();
+            showAlert('loading');
+
+            const response = await fetch(`/admin/orders/${orderId}/items/${productId}/return`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    returnStatus,
+                    adminComment
+                })
+            });
+
+            const data = await response.json();
+
+            hideAlert();
+            returnModal.classList.add('hidden'); // Close the modal
+
+            if (response.ok) {
+                updateUIReturn(orderId, productId, returnStatus);
+                showAlert('success', 'Return request processed successfully');
+            } else {
+                throw new Error(data.message || 'Failed to process return request');
+            }
+        } catch (error) {
+            hideAlert();
+            showAlert('error', error.message);
+        }
+    };
+}
+
 
         function closeReturnModal() {
             const modal = document.getElementById('returnModal');
