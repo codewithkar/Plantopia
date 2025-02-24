@@ -8,6 +8,11 @@ import dotenv from 'dotenv';
 import passport from "passport";
 import './utils/googleAuth.js';
 import cartWishlistCountMiddleware from './utils/cartWishlistCount.js';
+import helmetMiddleware from "./middlewares/helmetMiddleware.js";
+import cors from 'cors';
+import morgan from 'morgan';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 connectDB();
@@ -18,14 +23,17 @@ const app = express();
 app.set('view engine', 'ejs');
 
 //! Middleware
-
+app.use(cors({ origin: "*" })); // Allow all origins (for testing)
+app.use(helmetMiddleware);
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(nocache());
 
-
+const accessLogStream = fs.createWriteStream(path.join(process.cwd(), 'access.log'), { flags: 'a' });
+app.use(morgan('combined', { stream: accessLogStream })); 
+app.use(morgan('dev')); 
 
 // Express session
 app.use(session({
@@ -54,3 +62,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+

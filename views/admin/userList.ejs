@@ -99,7 +99,7 @@
         toggleLoading: (show) => {
           document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
         },
-  
+    
         showAlert: async ({ title, text, icon = 'success', showCancelButton = false }) => {
           return Swal.fire({
             title,
@@ -113,7 +113,7 @@
           });
         }
       };
-  
+    
       async function toggleUserBlock(userId, currentStatus) {
         try {
           const action = currentStatus ? 'unblock' : 'block';
@@ -124,29 +124,39 @@
             icon: 'warning',
             showCancelButton: true
           });
-  
+    
           if (!result.isConfirmed) return;
-  
+    
           utils.toggleLoading(true);
-  
+    
+          // Add credentials and update headers
           const response = await fetch(`/admin/user/${userId}/toggle-block`, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
             }
           });
-  
+    
           if (!response.ok) {
-            throw new Error('Failed to update user status');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Failed to update user status');
           }
-  
+    
+          const data = await response.json();
+    
           await utils.showAlert({
             title: 'Success!',
-            text: `User has been ${action}ed successfully`,
+            text: data.message || `User has been ${action}ed successfully`,
             icon: 'success'
           });
-  
-          window.location.reload();
+    
+          // Refresh the page after a short delay
+          setTimeout(() => {
+            window.location.href = '/admin/userList';
+          }, 1000);
+    
         } catch (error) {
           await utils.showAlert({
             title: 'Error!',
@@ -157,13 +167,13 @@
           utils.toggleLoading(false);
         }
       }
-  
+    
       // Check URL parameters for messages on page load
       document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const successMsg = urlParams.get('success');
         const errorMsg = urlParams.get('error');
-  
+    
         if (successMsg) {
           utils.showAlert({
             title: 'Success!',
@@ -171,7 +181,7 @@
             icon: 'success'
           });
         }
-  
+    
         if (errorMsg) {
           utils.showAlert({
             title: 'Error!',
@@ -180,59 +190,59 @@
           });
         }
       });
-  
+    
       async function fetchPage(page) {
-          try {
-              utils.toggleLoading(true);
-  
-              const response = await fetch(`/admin/userList?page=${page}`, {
-                  headers: {
-                      'X-Requested-With': 'XMLHttpRequest'
-                  }
-              });
-  
-              if (!response.ok) throw new Error('Failed to fetch users');
-  
-              const html = await response.text();
-  
-              // Create a temporary container
-              const temp = document.createElement('div');
-              temp.innerHTML = html;
-  
-              // Update the table body
-              const newTableBody = temp.querySelector('tbody');
-              document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
-  
-              // Update the pagination
-              const newPagination = temp.querySelector('.pagination-container');
-              document.querySelector('.pagination-container').innerHTML = newPagination.innerHTML;
-  
-          } catch (error) {
-              console.error('Error fetching users:', error);
-              await utils.showAlert({
-                  title: 'Error',
-                  text: 'Failed to fetch users',
-                  icon: 'error'
-              });
-          } finally {
-              utils.toggleLoading(false);
-          }
+        try {
+          utils.toggleLoading(true);
+    
+          const response = await fetch(`/admin/userList?page=${page}`, {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+    
+          if (!response.ok) throw new Error('Failed to fetch users');
+    
+          const html = await response.text();
+    
+          // Create a temporary container
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+    
+          // Update the table body
+          const newTableBody = temp.querySelector('tbody');
+          document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
+    
+          // Update the pagination
+          const newPagination = temp.querySelector('.pagination-container');
+          document.querySelector('.pagination-container').innerHTML = newPagination.innerHTML;
+    
+        } catch (error) {
+          console.error('Error fetching users:', error);
+          await utils.showAlert({
+            title: 'Error',
+            text: 'Failed to fetch users',
+            icon: 'error'
+          });
+        } finally {
+          utils.toggleLoading(false);
+        }
       }
-  
+    
       // Update your pagination links to use fetchPage
       document.addEventListener('DOMContentLoaded', () => {
-          const paginationContainer = document.querySelector('.pagination-container');
-          if (paginationContainer) {
-              paginationContainer.addEventListener('click', (e) => {
-                  e.preventDefault();
-                  if (e.target.tagName === 'A') {
-                      const page = new URLSearchParams(e.target.href.split('?')[1]).get('page');
-                      fetchPage(page);
-                  }
-              });
-          }
+        const paginationContainer = document.querySelector('.pagination-container');
+        if (paginationContainer) {
+          paginationContainer.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (e.target.tagName === 'A') {
+              const page = new URLSearchParams(e.target.href.split('?')[1]).get('page');
+              fetchPage(page);
+            }
+          });
+        }
       });
-      </script>
+    </script>
    
   </body>
 </html>
