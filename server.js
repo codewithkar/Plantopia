@@ -24,7 +24,7 @@ app.set('view engine', 'ejs');
 
 //! Middleware
 app.use(cors({ origin: "*" })); // Allow all origins (for testing)
-app.use(helmetMiddleware);
+// app.use(helmetMiddleware);
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
