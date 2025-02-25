@@ -15,7 +15,7 @@ import fs from 'fs';
 import path from 'path';
 
 dotenv.config();
-connectDB();
+connectDB(); 
 
 
 const app = express();
