@@ -399,6 +399,188 @@ const verifyRetryPayment = async (req, res) => {
     }
 };
 
+// const generateInvoice = async (req, res) => {
+//     try {
+//         const { orderId } = req.params;
+//         const userId = req.session.user;
+
+//         const order = await orderSchema.findOne({ _id: orderId, userId })
+//             .populate('userId')
+//             .populate('items.product');
+
+//         if (!order) {
+//             return res.status(404).json({ message: 'Order not found' });
+//         }
+
+
+//         // Create PDF document
+//         const doc = new PDFDocument({ margin: 50 });
+
+//         // Set response headers
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderCode}.pdf`);
+//         doc.pipe(res);
+
+//         // Generate separate invoice for each item
+//         order.items.forEach((item, index) => {
+//             if (index > 0) {
+//                 doc.addPage();
+//             }
+
+//            const  offer = item.product.offer;
+            
+           
+            
+          
+//             // Discount calculations (if applicable)
+//             const originalTotal = preTaxTotal + totalTax;
+//             const finalAmount = item.subtotal; // This is already the discounted total
+//             const totalDiscount = originalTotal - finalAmount;
+
+//             // Add header with company logo and tax invoice text
+//             doc.fontSize(20)
+//                .text('TAX INVOICE', { align: 'center' })
+//                .moveDown();
+
+//             // Add company details (left side)
+//             doc.fontSize(10)
+//                .text('Sold By:', 50)
+//                .font('Helvetica-Bold')
+//                .text('Plantopia')
+//                .font('Helvetica')
+//                .text('123 Nursary Street')
+//                .text('Kerala, India - 682001')
+//                .text('Phone: +91 9876543210')
+//                .text('Email: support@plantopia.com')
+//                .text('GSTIN: 32ABCDE1234F1Z5');
+
+//             // Add Invoice Details (right side)
+//             doc.fontSize(10)
+//                .text(`Invoice Number: ${order.orderCode}-${index + 1}`, 300, doc.y - 90)
+//                .text(`Order Date: ${new Date(order.orderDate).toLocaleDateString('en-IN')}`, 300)
+//                .text(`Invoice Date: ${new Date().toLocaleDateString('en-IN')}`, 300);
+
+//             // Add Billing Details
+//             doc.moveDown()
+//                .text('Billing Address:')
+//                .font('Helvetica-Bold')
+//                .text(`${order.shippingAddress.fullName}`)
+//                .font('Helvetica')
+//                .text(order.shippingAddress.addressLine1)
+//                .text(order.shippingAddress.addressLine2 || '')
+//                .text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`)
+//                .text(`PIN: ${order.shippingAddress.pincode}`)
+//                .text(`Phone: ${order.shippingAddress.mobileNumber}`)
+//                .moveDown();
+
+//             // Product Details Table
+//             doc.font('Helvetica-Bold');
+//             const tableTop = doc.y + 20;
+
+//             // Table Headers
+//             doc.text('Product Details', 50, tableTop)
+//                 .text('HSN', 200, tableTop)
+//                 .text('Qty', 250, tableTop)
+//                 .text('Offer Appied', 300, tableTop)
+//                 .text('Total', 500, tableTop);
+
+//             // Underline
+//             doc.moveTo(50, tableTop + 15)
+//                 .lineTo(550, tableTop + 15)
+//                 .stroke();
+
+//             // Product Details
+//             doc.font('Helvetica')
+//                 .text(item.product.productName, 50, tableTop + 30)
+//                 .text('6203', 200, tableTop + 30)
+//                 .text(item.quantity.toString(), 250, tableTop + 30)
+//                 .text(offer, 300, tableTop + 30)
+//                 .text(`₹${item.subtotal.toFixed(2)}`, 500, tableTop + 30);
+               
+//             // Price Breakdown
+//             const summaryTop = tableTop + 80;
+//             doc.moveTo(50, summaryTop).lineTo(550, summaryTop).stroke()
+//                 .font('Helvetica-Bold')
+//                 .text('Price Breakdown', 50, summaryTop + 20)
+//                 .font('Helvetica');
+
+//             // Detailed Summary
+//             let currentY = summaryTop + 40;
+            
+            
+
+//             // Tax details
+//             doc.text('CGST @ 9%:', 350, currentY)
+//                 .text(`₹${cgstAmount.toFixed(2)}`, 500, currentY);
+//             currentY += 20;
+
+//             doc.text('SGST @ 9%:', 350, currentY)
+//                 .text(`₹${sgstAmount.toFixed(2)}`, 500, currentY);
+//             currentY += 20;
+
+//             // Subtotal after tax
+//             doc.text('Total (Inc. Tax):', 350, currentY)
+//                 .text(`₹${originalTotal.toFixed(2)}`, 500, currentY);
+//             currentY += 20;
+
+//             // Discount (if applicable)
+//             if (totalDiscount > 0) {
+//                 doc.text('Discount Applied:', 350, currentY)
+//                     .text(`-₹${totalDiscount.toFixed(2)}`, 500, currentY);
+//                 currentY += 20;
+//             }
+
+//             // Final amount
+//             doc.moveTo(350, currentY).lineTo(550, currentY).stroke();
+//             currentY += 10;
+//             doc.font('Helvetica-Bold')
+//                 .text('Final Amount:', 350, currentY)
+//                 .text(`₹${finalAmount.toFixed(2)}`, 500, currentY);
+
+//             // Amount in words
+//             currentY += 40;
+//             doc.font('Helvetica')
+//                 .text('Amount in Words:', 50, currentY)
+//                 .text(`${numberToWords(Math.round(finalAmount))} Rupees Only`, 150, currentY);
+
+//             // Add Footer (within the page)
+//             const footerTop = doc.page.height - 120;
+            
+//             // Footer Border Top
+//             doc.moveTo(50, footerTop).lineTo(550, footerTop).stroke();
+
+//             // Footer Content
+//             doc.fontSize(8)
+//                .font('Helvetica')
+//                .text('Terms & Conditions:', 50, footerTop + 10)
+//                .text('1. This is a computer generated invoice.', 50, footerTop + 25)
+//                .text('2. All disputes are subject to Kerala jurisdiction.', 50, footerTop + 35)
+//                .text('3. E. & O. E.', 50, footerTop + 45);
+
+//             // Company Details in Footer
+//             doc.fontSize(8)
+//                .text('Plantopia', 350, footerTop + 10)
+//                .text('123 nursary Street, Kerala - 682001', 350, footerTop + 25)
+//                .text('Email: support@plantopia.com | Phone: +91 9876543210', 350, footerTop + 35)
+//                .text('GSTIN: 32ABCDE1234F1Z5', 350, footerTop + 45);
+
+//             // Footer Border Bottom
+//             doc.moveTo(50, footerTop + 70).lineTo(550, footerTop + 70).stroke();
+
+//         });
+
+//         // Finalize PDF
+//         doc.end();
+
+//     } catch (error) {
+//         console.error('Generate invoice error:', error);
+//         res.status(500).json({ 
+//             message: 'Error generating invoice',
+//             error: error.message 
+//         });
+//     }
+// };
+
 const generateInvoice = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -412,9 +594,11 @@ const generateInvoice = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-
-        // Create PDF document
-        const doc = new PDFDocument({ margin: 50 });
+        // Create PDF document with better margins
+        const doc = new PDFDocument({ 
+            margin: 40,
+            size: 'A4'
+        });
 
         // Set response headers
         res.setHeader('Content-Type', 'application/pdf');
@@ -426,161 +610,182 @@ const generateInvoice = async (req, res) => {
             if (index > 0) {
                 doc.addPage();
             }
-
-            // Calculate base prices and taxes
-            const TAX_RATE = 0.18;
-            const CGST_RATE = 0.09;
-            const SGST_RATE = 0.09;
-
-            // Pre-tax calculations
-            const preTaxPrice = item.price / (1 + TAX_RATE);
-            const preTaxTotal = preTaxPrice * item.quantity;
             
-            // Tax calculations
-            const cgstAmount = preTaxTotal * CGST_RATE;
-            const sgstAmount = preTaxTotal * SGST_RATE;
+            // Get coupon info with percentage
+            let couponApplied = 'No coupon applied';
+            let couponDiscount = '₹0.00';
+            let couponPercentage = '';
+            
+            if (order.coupon && order.coupon.code) {
+                couponPercentage = order.coupon.percentage ? ` (${order.coupon.percentage}%)` : '';
+                couponApplied = `${order.coupon.code}${couponPercentage}`;
+                couponDiscount = order.coupon.discount ? `₹${order.coupon.discount.toFixed(2)}` : '₹0.00';
+            }
+            
+            // Calculate tax amounts
+            const preTaxTotal = item.price * item.quantity;
+            const discountedPrice = item.discountedPrice > 0 ? item.discountedPrice : item.price;
+            const cgstRate = 0.09; // 9%
+            const sgstRate = 0.09; // 9%
+            const cgstAmount = preTaxTotal * cgstRate;
+            const sgstAmount = preTaxTotal * sgstRate;
             const totalTax = cgstAmount + sgstAmount;
-
-            // Discount calculations (if applicable)
+            
+            // Discount calculations
             const originalTotal = preTaxTotal + totalTax;
             const finalAmount = item.subtotal; // This is already the discounted total
             const totalDiscount = originalTotal - finalAmount;
+            
+            // Calculate product discount percentage (if applicable)
+            let productDiscountPercentage = '0%';
+            if (item.discountedPrice > 0 && item.price > 0) {
+                productDiscountPercentage = `${((item.price - item.discountedPrice) / item.price * 100).toFixed(0)}%`;
+            }
 
-            // Add header with company logo and tax invoice text
-            doc.fontSize(20)
-               .text('TAX INVOICE', { align: 'center' })
-               .moveDown();
-
-            // Add company details (left side)
-            doc.fontSize(10)
-               .text('Sold By:', 50)
+            // Add store name in large, centered text
+            doc.fontSize(24)
                .font('Helvetica-Bold')
-               .text('Plantopia')
+               .text('Plantopia', { align: 'center' })
+               .moveDown(0.5);
+               
+            // Add header with tax invoice text
+            doc.fontSize(18)
                .font('Helvetica')
-               .text('123 Nursary Street')
-               .text('Kerala, India - 682001')
-               .text('Phone: +91 9876543210')
-               .text('Email: support@plantopia.com')
-               .text('GSTIN: 32ABCDE1234F1Z5');
+               .text('Tax Invoice', { align: 'center' })
+               .moveDown(1);
 
-            // Add Invoice Details (right side)
+            // Create a clean, organized layout for invoice details
             doc.fontSize(10)
-               .text(`Invoice Number: ${order.orderCode}-${index + 1}`, 300, doc.y - 90)
-               .text(`Order Date: ${new Date(order.orderDate).toLocaleDateString('en-IN')}`, 300)
-               .text(`Invoice Date: ${new Date().toLocaleDateString('en-IN')}`, 300);
+               .font('Helvetica')
+               .text(`Invoice Date: ${new Date().toLocaleDateString('en-IN')}`, { align: 'left' })
+               .text(`Order ID: ${order.orderCode}`, { align: 'left' })
+               .text(`Customer Name: ${order.shippingAddress.fullName}`, { align: 'left' })
+               .text(`Email: ${order.userId.email || 'Not provided'}`, { align: 'left' })
+               .moveDown(0.5);
 
-            // Add Billing Details
-            doc.moveDown()
-               .text('Billing Address:')
-               .font('Helvetica-Bold')
+            // Shipping Address section with clear heading
+            doc.font('Helvetica-Bold')
+               .text('Shipping Address:', { align: 'left' })
+               .font('Helvetica')
                .text(`${order.shippingAddress.fullName}`)
-               .font('Helvetica')
                .text(order.shippingAddress.addressLine1)
                .text(order.shippingAddress.addressLine2 || '')
                .text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`)
                .text(`PIN: ${order.shippingAddress.pincode}`)
                .text(`Phone: ${order.shippingAddress.mobileNumber}`)
-               .moveDown();
+               .moveDown(1);
 
-            // Product Details Table
-            doc.font('Helvetica-Bold');
-            const tableTop = doc.y + 20;
-
+            // Create a clean, modern table for product details
             // Table Headers
-            doc.text('Product Details', 50, tableTop)
-                .text('HSN', 200, tableTop)
-                .text('Qty', 250, tableTop)
-                .text('Pre-tax Rate', 300, tableTop)
-                .text('Taxable Amount', 400, tableTop)
-                .text('Total', 500, tableTop);
-
-            // Underline
-            doc.moveTo(50, tableTop + 15)
-                .lineTo(550, tableTop + 15)
-                .stroke();
-
-            // Product Details
-            doc.font('Helvetica')
-                .text(item.product.productName, 50, tableTop + 30)
-                .text('6203', 200, tableTop + 30)
-                .text(item.quantity.toString(), 250, tableTop + 30)
-                .text(`₹${preTaxPrice.toFixed(2)}`, 300, tableTop + 30)
-                .text(`₹${preTaxTotal.toFixed(2)}`, 400, tableTop + 30)
-                .text(`₹${originalTotal.toFixed(2)}`, 500, tableTop + 30);
-
-            // Price Breakdown
-            const summaryTop = tableTop + 80;
-            doc.moveTo(50, summaryTop).lineTo(550, summaryTop).stroke()
-                .font('Helvetica-Bold')
-                .text('Price Breakdown', 50, summaryTop + 20)
-                .font('Helvetica');
-
-            // Detailed Summary
-            let currentY = summaryTop + 40;
+            const tableTop = doc.y;
             
-            // Pre-tax amount
-            doc.text('Pre-tax Amount:', 350, currentY)
-                .text(`₹${preTaxTotal.toFixed(2)}`, 500, currentY);
-            currentY += 20;
+            // Light gray background for header row
+            doc.rect(50, tableTop, 500, 20).fill('#f2f2f2');
+            
+            // Draw table headers with dark text
+            doc.fillColor('#000000')
+               .font('Helvetica-Bold')
+               .text('Item', 60, tableTop + 5)
+               .text('Quantity', 300, tableTop + 5)
+               .text('Price', 360, tableTop + 5)
+               .text('Discount', 420, tableTop + 5)
+               .text('Total', 490, tableTop + 5);
 
-            // Tax details
-            doc.text('CGST @ 9%:', 350, currentY)
-                .text(`₹${cgstAmount.toFixed(2)}`, 500, currentY);
-            currentY += 20;
+            // Item row with alternating background for better readability
+            const itemRowTop = tableTop + 25;
+            doc.rect(50, itemRowTop, 500, 30).fill('#f9f9f9');
+            
+            // Draw item details
+            doc.fillColor('#000000')
+               .font('Helvetica')
+               .text(item.product.productName, 60, itemRowTop + 10, { width: 230 })
+               .text(item.quantity.toString(), 300, itemRowTop + 10)
+               .text(`₹${item.price.toFixed(2)}`, 360, itemRowTop + 10)
+               .text(productDiscountPercentage, 420, itemRowTop + 10)
+               .text(`₹${item.subtotal.toFixed(2)}`, 490, itemRowTop + 10);
 
-            doc.text('SGST @ 9%:', 350, currentY)
-                .text(`₹${sgstAmount.toFixed(2)}`, 500, currentY);
+            // Summary section with light gray background
+            const summaryTop = itemRowTop + 50;
+            doc.rect(300, summaryTop, 250, 180).fill('#f9f9f9');
+            
+            // Summary title
+            doc.fillColor('#000000')
+               .font('Helvetica-Bold')
+               .text('Summary', 310, summaryTop + 10, { width: 230 });
+            
+            // Summary details
+            let currentY = summaryTop + 30;
+            
+            // Two-column layout for summary items
+            doc.font('Helvetica')
+               .text('Subtotal (before tax):', 310, currentY)
+               .text(`₹${preTaxTotal.toFixed(2)}`, 480, currentY, { align: 'right' });
             currentY += 20;
-
-            // Subtotal after tax
-            doc.text('Total (Inc. Tax):', 350, currentY)
-                .text(`₹${originalTotal.toFixed(2)}`, 500, currentY);
+            
+            doc.text(`SGST (${sgstRate * 100}%):`, 310, currentY)
+               .text(`₹${sgstAmount.toFixed(2)}`, 480, currentY, { align: 'right' });
             currentY += 20;
-
-            // Discount (if applicable)
-            if (totalDiscount > 0) {
-                doc.text('Discount Applied:', 350, currentY)
-                    .text(`-₹${totalDiscount.toFixed(2)}`, 500, currentY);
+            
+            doc.text(`CGST (${cgstRate * 100}%):`, 310, currentY)
+               .text(`₹${cgstAmount.toFixed(2)}`, 480, currentY, { align: 'right' });
+            currentY += 20;
+            
+            // Subtotal with tax
+            doc.text('Subtotal (Inc. tax):', 310, currentY)
+               .text(`₹${originalTotal.toFixed(2)}`, 480, currentY, { align: 'right' });
+            currentY += 20;
+            
+            // Coupon discount (if applicable)
+            if (order.coupon && order.coupon.discount > 0) {
+                doc.text(`Coupon Discount${couponPercentage}:`, 310, currentY)
+                   .text(`-₹${order.coupon.discount.toFixed(2)}`, 480, currentY, { align: 'right' });
                 currentY += 20;
             }
-
-            // Final amount
-            doc.moveTo(350, currentY).lineTo(550, currentY).stroke();
+            
+            // Product discount (if applicable)
+            if (totalDiscount > 0) {
+                doc.text(`Product Discount (${productDiscountPercentage}):`, 310, currentY)
+                   .text(`-₹${totalDiscount.toFixed(2)}`, 480, currentY, { align: 'right' });
+                currentY += 20;
+            }
+            
+            // Horizontal line before final amount
+            doc.moveTo(310, currentY).lineTo(530, currentY).stroke();
             currentY += 10;
+            
+            // Final amount with bold font
             doc.font('Helvetica-Bold')
-                .text('Final Amount:', 350, currentY)
-                .text(`₹${finalAmount.toFixed(2)}`, 500, currentY);
-
-            // Amount in words
+               .text('Final Amount:', 310, currentY)
+               .text(`₹${finalAmount.toFixed(2)}`, 480, currentY, { align: 'right' });
+            
+            // Payment information
             currentY += 40;
             doc.font('Helvetica')
-                .text('Amount in Words:', 50, currentY)
-                .text(`${numberToWords(Math.round(finalAmount))} Rupees Only`, 150, currentY);
-
-            // Add Footer (within the page)
-            const footerTop = doc.page.height - 120;
+               .text(`Payment Method: ${order.payment.method.toUpperCase()}`, 60, currentY)
+               .text(`Payment Status: ${order.payment.paymentStatus || 'Pending'}`, 300, currentY);
             
-            // Footer Border Top
+            // Amount in words
+            currentY += 30;
+            doc.font('Helvetica-Bold')
+               .text('Amount in Words:', 60, currentY)
+               .font('Helvetica')
+               .text(`${numberToWords(Math.round(finalAmount))} Rupees Only`, 170, currentY);
+
+            
+
+            // Add Footer with clean separation line
+            const footerTop = doc.page.height - 100;
             doc.moveTo(50, footerTop).lineTo(550, footerTop).stroke();
 
-            // Footer Content
+            // Footer Content with better layout
             doc.fontSize(8)
-               .font('Helvetica')
-               .text('Terms & Conditions:', 50, footerTop + 10)
-               .text('1. This is a computer generated invoice.', 50, footerTop + 25)
-               .text('2. All disputes are subject to Kerala jurisdiction.', 50, footerTop + 35)
-               .text('3. E. & O. E.', 50, footerTop + 45);
-
-            // Company Details in Footer
-            doc.fontSize(8)
-               .text('Plantopia', 350, footerTop + 10)
-               .text('123 nursary Street, Kerala - 682001', 350, footerTop + 25)
-               .text('Email: support@plantopia.com | Phone: +91 9876543210', 350, footerTop + 35)
-               .text('GSTIN: 32ABCDE1234F1Z5', 350, footerTop + 45);
-
-            // Footer Border Bottom
-            doc.moveTo(50, footerTop + 70).lineTo(550, footerTop + 70).stroke();
-
+               .text('Plantopia', 60, footerTop + 15, { width: 200 })
+               .text('123 Nursery Street, Kerala - 682001', 60, footerTop + 30)
+               .text('Email: support@plantopia.com | Phone: +91 9876543210', 60, footerTop + 45)
+               .text('GSTIN: 32ABCDE1234F1Z5', 60, footerTop + 60)
+               .fontSize(7)
+               .text('This is a computer generated invoice. All disputes are subject to Kerala jurisdiction. E. & O. E.', 
+                    { align: 'center', width: 500 });
         });
 
         // Finalize PDF
